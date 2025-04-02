@@ -282,7 +282,7 @@ async def main():
     application.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, handle_message))
 
     asyncio.create_task(shutdown(application))
-    application.run_polling()
+    await application.run_polling()
 
 if __name__ == '__main__':
     asyncio.run(main())
