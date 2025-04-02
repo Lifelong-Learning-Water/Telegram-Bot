@@ -1,0 +1,30 @@
+name: Run the llm_ai bot
+
+on:
+  workflow_dispatch:
+
+jobs:
+  Running:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
+
+    - name: Set up Python
+      uses: actions/setup-python@v2
+      with:
+        python-version: '3.8'
+
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install python-telegram-bot
+        pip install GitPython openai cryptography
+
+    - name: Run script
+      env:
+        BOT_TOKEN: ${{ secrets.BOT_TOKEN_llm_ai }}
+        CRYPTOGRAPHY_KEY: ${{ secrets.CRYPTOGRAPHY_KEY }}
+      run: |
+        python llm_ai.py
