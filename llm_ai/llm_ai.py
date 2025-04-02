@@ -12,7 +12,7 @@ from threading import Lock
 import requests
 
 development = False
-duration = 60
+duration = 120
 
 class UserDataManager:
     def __init__(self, file_path, key):
