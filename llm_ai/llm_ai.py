@@ -12,6 +12,7 @@ from threading import Lock
 import requests
 
 development = False
+duration = 60
 
 class UserDataManager:
     def __init__(self, file_path, key):
@@ -241,7 +242,7 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await context.bot.send_message(chat_id=user_id, text=f"An error occurred: {str(e)}")
 
 async def shutdown(application):
-    await asyncio.sleep(3600)  # 运行一小时后自动结束
+    await asyncio.sleep(duration)
     # 触发 GitHub Actions 工作流
     repo_name = "Telegram-Bot"
     workflow_id = "llm_ai.yml"
