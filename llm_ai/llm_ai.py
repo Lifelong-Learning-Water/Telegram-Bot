@@ -84,7 +84,7 @@ async def help_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
         "/new_conversation <code name> - Create a new conversation\n\n"
         "/switch <conversation_id> - Switch to a different conversation\n\n"
         "/list_conversations - View all conversations\n\n"
-        "/delete_history - Delete the current conversation history"
+        "/delete_current_conversation - Delete the current conversation."
     )
     await context.bot.send_message(chat_id=update.effective_chat.id, text=text)
 
