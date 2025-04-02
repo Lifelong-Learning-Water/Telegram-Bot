@@ -27,4 +27,4 @@ jobs:
         BOT_TOKEN: ${{ secrets.BOT_TOKEN_llm_ai }}
         CRYPTOGRAPHY_KEY: ${{ secrets.CRYPTOGRAPHY_KEY }}
       run: |
-        python llm_ai.py
+        python llm_ai/llm_ai.py
