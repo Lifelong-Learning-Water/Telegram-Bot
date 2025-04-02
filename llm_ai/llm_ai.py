@@ -9,6 +9,7 @@ import asyncio
 from git import Repo
 from collections import defaultdict
 from threading import Lock
+import requests
 
 development = False
 
@@ -221,6 +222,34 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
     except Exception as e:
         await context.bot.send_message(chat_id=user_id, text=f"An error occurred: {str(e)}")
 
+async def shutdown(application):
+    await asyncio.sleep(3600)  # 运行一小时后自动结束
+    # 触发 GitHub Actions 工作流
+    repo_name = "Telegram-Bot"
+    workflow_id = "llm_ai.yml"
+    github_token = os.environ['GITHUB_TOKEN']
+    url = f"https://api.github.com/repos/Alpha-Water/{repo_name}/actions/workflows/{workflow_id}/dispatches"
+    headers = {
+        "Authorization": f"Bearer {github_token}",
+        "Accept": "application/vnd.github.v3+json"
+    }
+    data = {
+        "ref": "main"  # 触发的分支
+    }
+    response = requests.post(url, headers=headers, json=data)
+    if response.status_code == 201:
+        print("GitHub Actions workflow triggered successfully.")
+    else:
+        print(f"Failed to trigger workflow: {response.status_code} {response.text}")
+
+    # 设置一个标志位，指示程序应该停止接收新消息
+    application.should_stop = True
+
+    # 等待所有任务完成
+    await application.shutdown()
+
+    print("Shutting down the bot...")
+
 def main():
     TOKEN = os.environ['BOT_TOKEN']
     application = ApplicationBuilder().token(TOKEN).build()
@@ -232,6 +261,9 @@ def main():
     application.add_handler(CommandHandler('list_conversations', list_conversations))
     application.add_handler(CommandHandler('delete_current_conversation', delete_current_conversation))
     application.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, handle_message))
+
+    # 启动定时器
+    asyncio.create_task(shutdown(application))
 
     application.run_polling()
 
