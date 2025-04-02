@@ -269,7 +269,7 @@ async def shutdown(application):
 
     print("Shutting down the bot...")
 
-def main():
+async def main():
     TOKEN = os.environ['BOT_TOKEN']
     application = ApplicationBuilder().token(TOKEN).build()
     application.add_handler(CommandHandler('start', start))
@@ -281,8 +281,8 @@ def main():
     application.add_handler(CommandHandler('delete_current_conversation', delete_current_conversation))
     application.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, handle_message))
 
-    asyncio.run(shutdown(application))
+    asyncio.create_task(shutdown(application))
     application.run_polling()
 
 if __name__ == '__main__':
-    main()
+    asyncio.run(main())
