@@ -71,7 +71,7 @@ class UserDataManager:
 user_data_manager = UserDataManager('llm_ai/user_data.enc', os.environ['CRYPTOGRAPHY_KEY'])
 
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    text = "Welcome to LLM AI!\nThis tool is open source: https://github.com/Alpha-Water/Telegram-Bot"
+    text = "Welcome to LLM AI!\nThis bot is open source!\n\nhttps://github.com/Alpha-Water/Telegram-Bot"
     await context.bot.send_message(chat_id=update.effective_chat.id, text=text)
     await help_command(update, context)
 
