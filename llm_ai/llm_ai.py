@@ -68,7 +68,7 @@ class UserDataManager:
         origin = repo.remote(name='origin')
         origin.push()
 
-user_data_manager = UserDataManager('llm_ai//user_data.enc', os.environ['CRYPTOGRAPHY_KEY'])
+user_data_manager = UserDataManager('llm_ai/user_data.enc', os.environ['CRYPTOGRAPHY_KEY'])
 
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     text = "Welcome to LLM AI!\nThis tool is open source: https://github.com/Alpha-Water/Telegram-Bot"
