@@ -212,6 +212,7 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
         return
     elif not user_settings['current_conversation']:
         await context.bot.send_message(chat_id=user_id, text="Please create a new conversation using /new_conversation <code name> first.")
+        return
     if user_settings.get('is_processing', False):
         await context.bot.send_message(chat_id=user_id, text="The information sent in the response is invalid.", reply_to_message_id=update.message.message_id)
         return
