@@ -281,7 +281,7 @@ def main():
     application.add_handler(CommandHandler('delete_current_conversation', delete_current_conversation))
     application.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, handle_message))
 
-    asyncio.create_task(shutdown(application))
+    asyncio.run(shutdown(application))
     application.run_polling()
 
 if __name__ == '__main__':
