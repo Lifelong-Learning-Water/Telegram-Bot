@@ -78,12 +78,12 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
 async def help_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
     text = (
         "Here are the available commands for the bot:\n"
-        "/start - Start the bot\n\n"
-        "/help - View help information\n\n"
-        "/set <token> <url> <model> - Set OpenAI Token, API URL, and model\n\n"
-        "/new_conversation <code name> - Create a new conversation\n\n"
-        "/switch <conversation_id> - Switch to a different conversation\n\n"
-        "/list_conversations - View all conversations\n\n"
+        "/start - Start the bot.\n\n"
+        "/help - View help information.\n\n"
+        "/set <token> <url> <model> - Set OpenAI Token, API URL, and model.\n\n"
+        "/new_conversation <code name> - Create a new conversation.\n\n"
+        "/switch <conversation_id> - Switch to a different conversation.\n\n"
+        "/list_conversations - View all conversations.\n\n"
         "/delete_current_conversation - Delete the current conversation."
     )
     await context.bot.send_message(chat_id=update.effective_chat.id, text=text)
