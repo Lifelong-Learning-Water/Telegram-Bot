@@ -283,7 +283,8 @@ async def main():
 
 
     application.run_polling()
-    asyncio.create_task(shutdown(application))
+    loop = asyncio.get_event_loop()
+    loop.run_until_complete(shutdown(application))
 
 if __name__ == '__main__':
     asyncio.run(main())
