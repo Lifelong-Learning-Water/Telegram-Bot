@@ -23,6 +23,6 @@ jobs:
 
     - name: Run script
       env:
-        BOT_TOKEN: ${{ secrets.BOT_TOKEN }}
+        BOT_TOKEN: ${{ secrets.BOT_TOKEN_navigation }}
       run: |
         python navigation/navigation.py
