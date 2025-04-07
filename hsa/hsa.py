@@ -53,7 +53,7 @@ def process_data(data):
 
 def main():
     # 初始化Telegram Bot
-    updater = Updater(BOT_TOKEN, use_context=True)
+    updater = Updater(BOT_TOKEN, use_context)
 
     for platform in platforms:
         title = platform['name']
