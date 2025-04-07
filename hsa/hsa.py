@@ -4,7 +4,7 @@ import logging
 import json
 
 # 配置部分
-BOT_TOKEN = os.environ['BOT_TOKEN_hsa]
+BOT_TOKEN = os.environ['BOT_TOKEN']
 CHANNEL_ID = '@lifelong_learning_dw'
 
 # 需要爬取的平台（仅选择新闻类）
@@ -63,7 +63,7 @@ def send_to_telegram(updater, title, content):
 
 def main():
     # 初始化Telegram Bot
-    updater = Updater(TOKEN, use_context=True)
+    updater = Updater(BOT_TOKEN, use_context=True)
     
     for platform in platforms:
         title = platform['name']
