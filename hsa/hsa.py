@@ -5,8 +5,8 @@ from pytrends.request import TrendReq
 import telegram
 
 # 配置信息（替换为您的信息）
-TELEGRAM_BOT_TOKEN = 'YOUR_TELEGRAM_BOT_TOKEN'
-TELEGRAM_CHANNEL_ID = '@your_channel_username'  # 例如：@mychannel
+TELEGRAM_BOT_TOKEN = os.environ[ 'BOT_TOKEN_HSA' ]
+TELEGRAM_CHANNEL_ID = '@lifelong_learning_dw'
 WEIBO_URL = 'https://m.weibo.cn/api/statuses/hot_topic_list'
 GOOGLE_TRENDS_HL = 'zh-CN'  # 语言设置（中文）
 GOOGLE_TRENDS_TZ = 360      # 时区设置（中国标准时间）
