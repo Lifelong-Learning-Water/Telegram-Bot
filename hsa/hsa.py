@@ -1,65 +1,80 @@
-import os
 import requests
-from bs4 import BeautifulSoup
-from pytrends.request import TrendReq
-import telegram
+from telegram.ext import Updater, CommandHandler, MessageHandler, Filters
+import logging
+import json
 
-# 配置信息（替换为您的信息）
-BOT_TOKEN = os.environ[ 'BOT_TOKEN' ]
-TELEGRAM_CHANNEL_ID = '@lifelong_learning_dw'
-WEIBO_URL = 'https://m.weibo.cn/api/statuses/hot_topic_list'
-GOOGLE_TRENDS_HL = 'zh-CN'  # 语言设置（中文）
-GOOGLE_TRENDS_TZ = 360      # 时区设置（中国标准时间）
+# 配置部分
+BOT_TOKEN = os.environ['BOT_TOKEN_hsa]
+CHANNEL_ID = '@lifelong_learning_dw'
 
-def get_weibo_hot():
-    """获取微博热搜"""
+# 需要爬取的平台（仅选择新闻类）
+platforms = [
+    {'name': '百度', 'title': '百度'},
+    {'name': '知乎', 'title': '知乎'},
+    {'name': '微博热搜', 'title': '微博热搜'},
+    # 添加其他需要的平台
+]
+
+def get_hot_search(platform_title):
+    """
+    爬取指定平台的热搜数据
+    """
+    url = f'https://api.pearktrue.cn/api/dailyhot/?title={platform_title}'
     try:
-        headers = {
-            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36'
+        response = requests.get(url)
+        if response.status_code == 200:
+            return response.json()
+        else:
+            print(f"获取{platform_title}热搜失败，状态码：{response.status_code}")
+            return None
+    except Exception as e:
+        print(f"获取{platform_title}热搜时发生错误：{str(e)}")
+        return None
+
+def process_data(data):
+    """
+    处理抓取到的数据，提取需要的信息
+    """
+    if not data or data['code'] != 200:
+        return []
+    
+    hot_search_list = []
+    for item in data.get('data', []):
+        hot_item = {
+            'title': item.get('title', ''),
+            'desc': item.get('desc', ''),
+            'url': item.get('mobileUrl', '')
         }
-        response = requests.get(WEIBO_URL, headers=headers, timeout=10)
-        data = response.json()
-        return [item['name'] for item in data['data']['hot_list']]
-    except Exception as e:
-        print(f"获取微博热搜失败: {str(e)}")
-        return []
+        hot_search_list.append(hot_item)
+    
+    return hot_search_list
 
-def get_google_trends():
-    """获取Google Trends实时热搜"""
+def send_to_telegram(updater, title, content):
+    """
+    发送消息到Telegram频道
+    """
+    bot = updater.bot
+    message = f"*{title}*\n\n{'\n'.join([f'🔥 {item["title"]}' for item in content])}"
     try:
-        pytrends = TrendReq(hl=GOOGLE_TRENDS_HL, tz=GOOGLE_TRENDS_TZ, timeout=(10, 25), retries=2)
-        trends = pytrends.trending_searches(pn='united_states')  # 可调整国家代码
-        return trends[0].tolist()[:10]  # 取前10个
+        bot.send_message(chat_id=CHANNEL_ID, text=message, parse_mode='Markdown')
+        print(f"成功发送消息：{title}")
     except Exception as e:
-        print(f"获取Google Trends失败: {str(e)}")
-        return []
-
-def send_to_telegram(message):
-    """发送消息到Telegram频道"""
-    bot = telegram.Bot(token=BOT_TOKEN)
-    try:
-        bot.send_message(chat_id=TELEGRAM_CHANNEL_ID, text=message, parse_mode='Markdown')
-        print("消息发送成功！")
-    except Exception as e:
-        print(f"发送失败: {str(e)}")
+        print(f"发送消息失败：{str(e)}")
 
 def main():
-    # 获取热搜数据
-    weibo_hot = get_weibo_hot()
-    google_trends = get_google_trends()
+    # 初始化Telegram Bot
+    updater = Updater(TOKEN, use_context=True)
     
-    # 构建消息内容
-    message = "🔥 当前热搜榜单 🌟\n\n"
-    message += "### 微博热搜\n"
-    for idx, topic in enumerate(weibo_hot[:10], 1):
-        message += f"{idx}. {topic}\n"
-    
-    message += "\n### Google Trends热搜\n"
-    for idx, topic in enumerate(google_trends[:10], 1):
-        message += f"{idx}. {topic}\n"
-    
-    # 发送到Telegram
-    send_to_telegram(message)
+    for platform in platforms:
+        title = platform['name']
+        data = get_hot_search(platform['title'])
+        if not data:
+            continue
+        
+        hot_list = process_data(data)
+        if hot_list:
+            send_to_telegram(updater, title, hot_list)
 
-if __name__ == "__main__":
+if __name__ == '__main__':
+    logging.basicConfig(level=logging.INFO)
     main()
