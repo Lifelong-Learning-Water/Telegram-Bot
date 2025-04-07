@@ -5,7 +5,7 @@ from pytrends.request import TrendReq
 import telegram
 
 # 配置信息（替换为您的信息）
-TELEGRAM_BOT_TOKEN = os.environ[ 'BOT_TOKEN_HSA' ]
+BOT_TOKEN = os.environ[ 'BOT_TOKEN' ]
 TELEGRAM_CHANNEL_ID = '@lifelong_learning_dw'
 WEIBO_URL = 'https://m.weibo.cn/api/statuses/hot_topic_list'
 GOOGLE_TRENDS_HL = 'zh-CN'  # 语言设置（中文）
@@ -36,7 +36,7 @@ def get_google_trends():
 
 def send_to_telegram(message):
     """发送消息到Telegram频道"""
-    bot = telegram.Bot(token=TELEGRAM_BOT_TOKEN)
+    bot = telegram.Bot(token=BOT_TOKEN)
     try:
         bot.send_message(chat_id=TELEGRAM_CHANNEL_ID, text=message, parse_mode='Markdown')
         print("消息发送成功！")
