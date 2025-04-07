@@ -1,5 +1,5 @@
 import requests
-from telegram.ext import Updater, CommandHandler, MessageHandler, Filters
+from telegram.ext import Updater, CommandHandler, MessageHandler, filters
 import logging
 import json
 import os  # 确保已导入os模块
