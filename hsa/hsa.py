@@ -2,6 +2,7 @@ import requests
 from telegram.ext import Updater, CommandHandler, MessageHandler, Filters
 import logging
 import json
+import os  # 确保已导入os模块
 
 # 配置部分
 BOT_TOKEN = os.environ['BOT_TOKEN']
@@ -35,9 +36,10 @@ def process_data(data):
     """
     处理抓取到的数据，提取需要的信息
     """
+    print(data)
     if not data or data['code'] != 200:
         return []
-    
+
     hot_search_list = []
     for item in data.get('data', []):
         hot_item = {
@@ -46,34 +48,29 @@ def process_data(data):
             'url': item.get('mobileUrl', '')
         }
         hot_search_list.append(hot_item)
-    
-    return hot_search_list
 
-def send_to_telegram(updater, title, content):
-    """
-    发送消息到Telegram频道
-    """
-    bot = updater.bot
-    message = f"*{title}*\n\n{'\n'.join([f'🔥 {item["title"]}' for item in content])}"
-    try:
-        bot.send_message(chat_id=CHANNEL_ID, text=message, parse_mode='Markdown')
-        print(f"成功发送消息：{title}")
-    except Exception as e:
-        print(f"发送消息失败：{str(e)}")
+    return hot_search_list
 
 def main():
     # 初始化Telegram Bot
     updater = Updater(BOT_TOKEN, use_context=True)
-    
+
     for platform in platforms:
         title = platform['name']
         data = get_hot_search(platform['title'])
         if not data:
             continue
-        
+
         hot_list = process_data(data)
         if hot_list:
-            send_to_telegram(updater, title, hot_list)
+            # 打印抓取到的数据
+            print(f"\n=== {title} 热搜 ===")
+            for index, item in enumerate(hot_list, 1):
+                print(f"{index}. 标题: {item['title']}")
+                print(f"描述: {item['desc']}")
+                print(f"链接: {item['url']}\n")
+            # 如果需要发送消息，解除下行注释
+            # send_to_telegram(updater, title, hot_list)
 
 if __name__ == '__main__':
     logging.basicConfig(level=logging.INFO)
