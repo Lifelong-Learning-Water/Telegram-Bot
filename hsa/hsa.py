@@ -1,6 +1,7 @@
 import os
 import requests
 import time
+import asyncio
 from telegram import Bot
 
 # 配置信息
@@ -54,14 +55,14 @@ async def send_to_telegram(platform, formatted_data):
         comment_message = "\n".join(group)
         await bot.send_message(chat_id=TELEGRAM_CHANNEL_ID, text=comment_message, parse_mode='Markdown', reply_to_message_id=sent_message.message_id)
 
-def main():
+async def main():
     for platform in PLATFROMS:
         print(f"正在获取：{platform[0]}")
         data = fetch_hot_data(platform[0])
         if data:
             formatted = format_hot_data(data, platform[1])
-            send_to_telegram(platform[0], formatted)
+            await send_to_telegram(platform[0], formatted)
         time.sleep(1)  # 避免请求过快
 
 if __name__ == "__main__":
-    main()
+    asyncio.run(main())
