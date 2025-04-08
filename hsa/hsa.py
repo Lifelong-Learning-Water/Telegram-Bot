@@ -41,7 +41,7 @@ def format_hot_data(data_list, url_key):
         title = item.get("title", "无标题")
         link = item.get(url_key, "#")
         hot = item.get("hot", "无热度")
-        formatted.append(f"{index}. [{title}]({link}) (热度: {hot})")
+        formatted.append(f"{index}. [{title}]({link}) *{hot}🔥*")
     return formatted
 
 async def send_to_telegram(platform, formatted_data):
