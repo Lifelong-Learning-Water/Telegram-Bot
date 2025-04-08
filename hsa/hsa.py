@@ -59,7 +59,9 @@ async def send_to_telegram(platform, formatted_data):
 
     # 查找最近的转发消息
     for update in updates:
+        print(update.message)
         if update.message and update.message.chat.id == int(TELEGRAM_GROUP_ID):
+            print(update.message)
             # 检查消息时间戳是否在发送时间之后
             if update.message.date.timestamp() >= sent_time:
                 print(update.message)
