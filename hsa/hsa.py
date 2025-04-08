@@ -62,8 +62,9 @@ async def send_to_telegram(platform, formatted_data):
     print(sent_message)
     for update in updates:
         print(update.message)
-        if update.message and update.message.chat.id == int(TELEGRAM_GROUP_ID) & update.message.date.timestamp() >= sent_time & update.message.is_automatic_forward:                    forwarded_message_id = update.message.message_id
-                    break
+        if update.message and update.message.chat.id == int(TELEGRAM_GROUP_ID) & update.message.date.timestamp() >= sent_time & update.message.is_automatic_forward:
+            forwarded_message_id = update.message.message_id
+            break
 
     if forwarded_message_id is None:
         print("未找到转发的消息 ID")
