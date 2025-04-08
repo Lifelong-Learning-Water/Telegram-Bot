@@ -11,7 +11,7 @@ PLATFROMS = [
 ]
 
 TELEGRAM_BOT_TOKEN = os.environ["BOT_TOKEN"]
-TELEGRAM_CHANNEL_ID = '@lifelong_learning_dw'
+TELEGRAM_CHANNEL_ID = '@hot_search_aggregation'
 
 bot = Bot(token=TELEGRAM_BOT_TOKEN)
 
