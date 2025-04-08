@@ -53,7 +53,7 @@ async def send_to_telegram(platform, formatted_data):
     sent_message = await bot.send_message(chat_id=TELEGRAM_CHANNEL_ID, text=message, parse_mode='Markdown')
 
     # 等待一段时间以确保消息被转发
-    await asyncio.sleep(5)
+    await asyncio.sleep(6)
     sent_time = sent_message.date.timestamp()  # 获取发送时间的时间戳
 
     # 获取群组中的最新消息
@@ -62,7 +62,7 @@ async def send_to_telegram(platform, formatted_data):
 
     # 查找最近的转发消息
     for update in updates:
-        if update.message and update.message.chat.id == int(TELEGRAM_GROUP_ID) and update.message.date.timestamp() >= sent_time and update.message.is_automatic_forward:
+        if update.message and update.message.chat.id == int(TELEGRAM_GROUP_ID) and update.message.date.timestamp() > sent_time and update.message.is_automatic_forward:
             forwarded_message_id = update.message.message_id
             break
 
