@@ -14,7 +14,7 @@ PLATFROMS = [
     ["IT之家", "url"], ["腾讯新闻", "url"],
     ["今日头条", "url"], ["36氪", "url"],
     ["稀土掘金", "mobileUrl"], ["知乎", "url"],
-    ["bilibili", "mobileUrl"], ["澎湃新闻", "url"]
+    ["哔哩哔哩", "mobileUrl"], ["澎湃新闻", "url"]
 ]
 
 TELEGRAM_BOT_TOKEN = os.environ["BOT_TOKEN"]
