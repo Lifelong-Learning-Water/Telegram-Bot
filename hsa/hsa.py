@@ -64,7 +64,7 @@ async def send_to_telegram(platform, formatted_data):
             print(1)
             print(update.message)
             # 检查消息时间戳是否在发送时间之后
-            if update.message.date.timestamp() >= sent_time:
+            if True:
                 print(2)
                 print(update.message)
                 if update.message.is_automatic_forward:
