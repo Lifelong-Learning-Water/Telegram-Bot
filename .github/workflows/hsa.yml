@@ -26,6 +26,6 @@ jobs:
     - name: Run script
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        BOT_TOKEN: ${{ secrets.BOT_TOKEN_hsa }}
+        BOT_TOKEN: ${{ secrets.BOT_TOKEN_HSA }}
       run: |
         python hsa/hsa.py
