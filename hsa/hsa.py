@@ -13,6 +13,7 @@ PLATFROMS = [
 
 TELEGRAM_BOT_TOKEN = os.environ["BOT_TOKEN"]
 TELEGRAM_CHANNEL_ID = '@hot_search_aggregation'
+TELEGRAM_GROUP_ID = '-1002699038758'
 
 bot = Bot(token=TELEGRAM_BOT_TOKEN)
 
@@ -53,7 +54,8 @@ async def send_to_telegram(platform, formatted_data):
     for i in range(5, len(formatted_data), 5):
         group = formatted_data[i:i+5]
         comment_message = "\n".join(group)
-        await bot.send_message(chat_id=TELEGRAM_CHANNEL_ID, text=comment_message, parse_mode='Markdown', reply_to_message_id=sent_message.message_id)
+        await bot.send_message(chat_id=TELEGRAM_GROUP_ID, text=comment_message, parse_mode='Markdown', reply_to_message_id=sent_message.message_id)
+        time.sleep(0.5)  # 避免请求过快
 
 async def main():
     for platform in PLATFROMS:
