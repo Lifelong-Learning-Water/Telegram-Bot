@@ -1,6 +1,7 @@
 import os
 import requests
 import time
+from datetime import datetime
 import asyncio
 from telegram import Bot
 
@@ -45,6 +46,10 @@ def format_hot_data(data_list, url_key):
 
 async def send_to_telegram(platform, formatted_data):
     """发送数据到 Telegram 频道"""
+    # 发送当前时间
+    current_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    await bot.send_message(chat_id=TELEGRAM_CHANNEL_ID, text=f"当前时间: {current_time}", parse_mode='Markdown')
+
     # 发送前5项
     top_five = formatted_data[:5]
     message = f"**{platform} 热搜榜单**\n" + "\n".join(top_five)
@@ -75,7 +80,6 @@ async def send_to_telegram(platform, formatted_data):
         comment_message = "\n".join(group)
         await bot.send_message(chat_id=TELEGRAM_GROUP_ID, text=comment_message, parse_mode='Markdown', reply_to_message_id=forwarded_message_id)
         await asyncio.sleep(5)  # 避免请求过快
-
 async def main():
     for platform in PLATFROMS:
         print(f"正在获取：{platform[0]}")
