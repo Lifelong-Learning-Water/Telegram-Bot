@@ -54,25 +54,27 @@ async def send_to_telegram(platform, formatted_data):
     await asyncio.sleep(10)
 
     # 获取群组中的最新消息
-    updates = await bot.get_updates()
+    offset = 0  # 初始化 offset
     forwarded_message_id = None
     sent_time = sent_message.date.timestamp()  # 获取发送时间的时间戳
-    print(sent_time)
-    # 查找最近的转发消息
-    for update in updates:
-        print(1)
-        print(update.message)
-        if update.message and update.message.chat.id == int(TELEGRAM_GROUP_ID):
-            print(2)
-            print(update.message.date.timestamp())
-            # 检查消息时间戳是否在发送时间之后
-            if update.message.date.timestamp() > sent_time:
-                print(3)
-                print(update.message.is_automatic_forward)
-                # 检查消息内容是否包含平台名称
-                if update.message.is_automatic_forward:
-                    forwarded_message_id = update.message.message_id
-                    break
+
+    while True:
+        updates = await bot.get_updates(offset=offset)
+
+        for update in updates:
+            if update.message and update.message.chat.id == int(TELEGRAM_GROUP_ID):
+                # 检查消息时间戳是否在发送时间之后
+                if update.message.date.timestamp() > sent_time:
+                    # 检查消息是否为转发消息
+                    if update.message.is_automatic_forward:
+                        forwarded_message_id = update.message.message_id
+                        break
+
+            # 更新 offset 为当前更新的 ID + 1
+            offset = update.update_id + 1
+
+        if forwarded_message_id is not None:
+            break
 
     if forwarded_message_id is None:
         print("未找到转发的消息 ID")
