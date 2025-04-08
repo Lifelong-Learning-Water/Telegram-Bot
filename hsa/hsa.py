@@ -61,7 +61,8 @@ async def send_to_telegram(platform, formatted_data):
     while True:
         updates = await bot.get_updates(offset=offset)
 
-        if update == []: break
+        if update == []:
+            break
         for update in updates:
             if update.message and update.message.chat.id == int(TELEGRAM_GROUP_ID):
                 # 检查消息时间戳是否在发送时间之后
