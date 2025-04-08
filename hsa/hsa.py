@@ -51,12 +51,13 @@ async def send_to_telegram(platform, formatted_data):
     sent_message = await bot.send_message(chat_id=TELEGRAM_CHANNEL_ID, text=message, parse_mode='Markdown')
 
     # 发送剩余部分，每5个一组作为评论
+"""
     for i in range(5, len(formatted_data), 5):
         group = formatted_data[i:i+5]
         comment_message = "\n".join(group)
         await bot.send_message(chat_id=TELEGRAM_GROUP_ID, text=comment_message, parse_mode='Markdown', reply_to_message_id=sent_message.message_id)
-        time.sleep(0.5)  # 避免请求过快
-
+        time.sleep(1)  # 避免请求过快
+"""
 async def main():
     for platform in PLATFROMS:
         print(f"正在获取：{platform[0]}")
