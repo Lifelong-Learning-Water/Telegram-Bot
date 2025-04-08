@@ -46,13 +46,13 @@ def send_to_telegram(platform, formatted_data):
     # 发送前5项
     top_five = formatted_data[:5]
     message = f"**{platform} 热搜榜单**\n" + "\n".join(top_five)
-    sent_message = bot.send_message(chat_id=TELEGRAM_CHANNEL_ID, text=message, parse_mode='Markdown')
+    sent_message = await bot.send_message(chat_id=TELEGRAM_CHANNEL_ID, text=message, parse_mode='Markdown')
 
     # 发送剩余部分，每5个一组作为评论
     for i in range(5, len(formatted_data), 5):
         group = formatted_data[i:i+5]
         comment_message = "\n".join(group)
-        bot.send_message(chat_id=TELEGRAM_CHANNEL_ID, text=comment_message, parse_mode='Markdown', reply_to_message_id=sent_message.message_id)
+        await bot.send_message(chat_id=TELEGRAM_CHANNEL_ID, text=comment_message, parse_mode='Markdown', reply_to_message_id=sent_message.message_id)
 
 def main():
     for platform in PLATFROMS:
