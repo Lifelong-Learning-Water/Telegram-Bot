@@ -7,7 +7,8 @@ from telegram import Bot
 # 配置信息
 API_BASE_URL = "https://api.pearktrue.cn/api/dailyhot/"
 PLATFROMS = [
-    ["百度", "url"],
+    ["百度", "url"], ["知乎", "url"], ["百度贴吧", "url"], ["少数派", "url"], ["IT之家", "url"],
+    ["澎湃新闻", "url"], ["今日头条", "url"], ["36氪", "url"], ["稀土掘金", "mobileUrl"], ["腾讯新闻", "url"]
 ]
 
 TELEGRAM_BOT_TOKEN = os.environ["BOT_TOKEN"]
@@ -55,14 +56,17 @@ async def send_to_telegram(platform, formatted_data):
     # 获取群组中的最新消息
     updates = await bot.get_updates()
     forwarded_message_id = None
+    sent_time = sent_message.date.timestamp()  # 获取发送时间的时间戳
 
     # 查找最近的转发消息
     for update in updates:
         if update.message and update.message.chat.id == int(TELEGRAM_GROUP_ID):
-            # 检查消息内容是否包含平台名称
-            if update.message.is_automatic_forward:
-                forwarded_message_id = update.message.message_id
-                break
+            # 检查消息时间戳是否在发送时间之后
+            if update.message.date.timestamp() > sent_time:
+                # 检查消息内容是否包含平台名称
+                if update.message.is_automatic_forward:
+                    forwarded_message_id = update.message.message_id
+                    break
 
     if forwarded_message_id is None:
         print("未找到转发的消息 ID")
