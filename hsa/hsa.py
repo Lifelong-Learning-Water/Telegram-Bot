@@ -1,7 +1,7 @@
 import os
 import requests
 import time
-import datetime from datetime
+from datetime import datetime
 import pytz
 import asyncio
 from telegram import Bot
