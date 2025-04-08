@@ -83,7 +83,7 @@ async def send_to_telegram(platform, formatted_data):
         group = formatted_data[i:i+5]
         comment_message = "\n".join(group)
         await bot.send_message(chat_id=TELEGRAM_GROUP_ID, text=comment_message, parse_mode='Markdown', reply_to_message_id=forwarded_message_id)
-        await asyncio.sleep(1)  # 避免请求过快
+        await asyncio.sleep(2.5)  # 避免请求过快
 
 async def main():
     for platform in PLATFROMS:
@@ -92,7 +92,7 @@ async def main():
         if data:
             formatted = format_hot_data(data, platform[1])
             await send_to_telegram(platform[0], formatted)
-        await asyncio.sleep(1)  # 避免请求过快
+        await asyncio.sleep(2.5)  # 避免请求过快
 
 if __name__ == "__main__":
     asyncio.run(main())
