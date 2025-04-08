@@ -60,7 +60,6 @@ async def send_to_telegram(platform, formatted_data):
     forwarded_message_id = None
 
     # 查找最近的转发消息
-    print(sent_message)
     for update in updates:
         if update.message and update.message.chat.id == int(TELEGRAM_GROUP_ID) and update.message.date.timestamp() >= sent_time and update.message.is_automatic_forward:
             forwarded_message_id = update.message.message_id
