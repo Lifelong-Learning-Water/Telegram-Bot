@@ -36,7 +36,7 @@ def fetch_hot_data(platform):
 def format_hot_data(data_list, url_key):
     """格式化数据为可读文本"""
     formatted = []
-    for index, item in enumerate(data_list, start=1):
+    for index, item in enumerate(data_list, 1):  # 从1开始计数
         title = item.get("title", "无标题")
         link = item.get(url_key, "#")
         hot = item.get("hot", "无热度")
@@ -48,23 +48,30 @@ async def send_to_telegram(platform, formatted_data):
     # 发送前5项
     top_five = formatted_data[:5]
     message = f"**{platform} 热搜榜单**\n" + "\n".join(top_five)
+    
     sent_message = await bot.send_message(chat_id=TELEGRAM_CHANNEL_ID, text=message, parse_mode='Markdown')
-
+    
     # 发送剩余部分，每5个一组作为评论
     for i in range(5, len(formatted_data), 5):
         group = formatted_data[i:i+5]
         comment_message = "\n".join(group)
-        await bot.send_message(chat_id=TELEGRAM_GROUP_ID, text=comment_message, parse_mode='Markdown', reply_to_message_id=sent_message.message_id)
-        await asyncio.sleep(1)  # 避免请求过快
+        
+        # 使用reply_to_message_id参数关联到频道消息
+        await bot.send_message(
+            chat_id=TELEGRAM_GROUP_ID,
+            text=comment_message,
+            parse_mode='Markdown',
+            reply_to_message_id=sent_message.message_id
+        )
+        time.sleep(1)  # 避免请求过快
 
 async def main():
-    for platform in PLATFROMS:
-        print(f"正在获取：{platform[0]}")
-        data = fetch_hot_data(platform[0])
-        if data:
-            formatted = format_hot_data(data, platform[1])
-            await send_to_telegram(platform[0], formatted)
-        await asyncio.sleep(1)  # 避免请求过快
+    for platform, url_key in PLATFROMS:
+        data = fetch_hot_data(platform)
+        if not data:
+            continue
+        formatted_data = format_hot_data(data, url_key)
+        await send_to_telegram(platform, formatted_data)
 
 if __name__ == "__main__":
     asyncio.run(main())
