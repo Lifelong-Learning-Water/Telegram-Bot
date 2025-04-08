@@ -2,6 +2,7 @@ import os
 import requests
 import time
 from datetime import datetime
+import pytz
 import asyncio
 from telegram import Bot
 
@@ -77,9 +78,9 @@ async def send_to_telegram(platform, formatted_data):
         await asyncio.sleep(3)  # 避免请求过快
 
 async def main():
-    # 发送当前时间
+    tz = pytz.timezone('Asia/Shanghai')
     current_time = datetime.now().strftime("%Y-%m-%d %H:%M")
-    await bot.send_message(chat_id=TELEGRAM_CHANNEL_ID, text=f"当前时间: {current_time}", parse_mode='Markdown')
+    await bot.send_message(chat_id=TELEGRAM_CHANNEL_ID, text=f"北京时间: {current_time}", parse_mode='Markdown')
     await asyncio.sleep(3)
 
     for platform in PLATFROMS:
