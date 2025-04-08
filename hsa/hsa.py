@@ -48,7 +48,7 @@ async def send_to_telegram(platform, formatted_data):
     top_five = formatted_data[:5]
     message = f"**{platform} 热搜榜单**\n" + "\n".join(top_five)
     sent_message = await bot.send_message(chat_id=TELEGRAM_CHANNEL_ID, text=message, parse_mode='Markdown')
-
+"""
     # 等待一段时间以确保消息被转发
     await asyncio.sleep(2)
 
@@ -74,7 +74,7 @@ async def send_to_telegram(platform, formatted_data):
         comment_message = "\n".join(group)
         await bot.send_message(chat_id=TELEGRAM_GROUP_ID, text=comment_message, parse_mode='Markdown', reply_to_message_id=forwarded_message_id)
         await asyncio.sleep(1)  # 避免请求过快
-
+"""
 async def main():
     for platform in PLATFROMS:
         print(f"正在获取：{platform[0]}")
