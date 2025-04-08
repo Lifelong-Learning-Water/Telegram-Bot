@@ -81,7 +81,6 @@ async def main():
     tz = pytz.timezone('Asia/Shanghai')
     current_time = datetime.now(tz).strftime("%Y-%m-%d %H:%M")
     await bot.send_message(chat_id=TELEGRAM_CHANNEL_ID, text=f"北京时间: {current_time}", parse_mode='Markdown')
-    await asyncio.sleep(3)
 
     for platform in PLATFROMS:
         print(f"正在获取：{platform[0]}")
