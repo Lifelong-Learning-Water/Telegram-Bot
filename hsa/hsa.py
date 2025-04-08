@@ -4,8 +4,8 @@ import time
 # 配置信息
 API_BASE_URL = "https://api.pearktrue.cn/api/dailyhot/"
 PLATFROMS = [
-    "哔哩哔哩", "百度", "知乎", "百度贴吧", "少数派", "IT之家",
-    "澎湃新闻", "今日头条", "微博热搜", "36氪", "稀土掘金", "腾讯新闻"
+    ["百度", "url"], ["知乎"], ["百度贴吧"], ["少数派"], ["IT之家"],
+    ["澎湃新闻"], ["今日头条"], ["36氪"], ["稀土掘金"], ["腾讯新闻"]
 ]
 
 def fetch_hot_data(platform):
@@ -16,7 +16,6 @@ def fetch_hot_data(platform):
         response.raise_for_status()
         data = response.json()
         if data.get("code") == 200:
-            print(data)
             return data.get("data", [])
         else:
             print(f"警告：{platform} API返回错误：{data.get('message')}")
@@ -25,12 +24,12 @@ def fetch_hot_data(platform):
         print(f"错误：请求{platform}时发生异常：{str(e)}")
         return []
 
-def format_hot_data(data_list):
+def format_hot_data(data_list, url_key):
     """格式化数据为可读文本"""
     formatted = []
     for item in data_list:
         title = item.get("title", "无标题")
-        link = item.get("link", "#")
+        link = item.get(url_key, "#")
         hot = item.get("hot", "无热度")
         formatted.append(f"- [{title}]({link}) (热度: {hot})")
     return "\n".join(formatted)
@@ -38,10 +37,10 @@ def format_hot_data(data_list):
 def main():
     result = []
     for platform in PLATFROMS:
-        print(f"正在获取：{platform}")
-        data = fetch_hot_data(platform)
+        print(f"正在获取：{platform[0]}")
+        data = fetch_hot_data(platform[0])
         if data:
-            formatted = format_hot_data(data)
+            formatted = format_hot_data(data, platform[1])
             result.append(f"**{platform} 热搜榜单**\n{formatted}\n\n")
         time.sleep(1)  # 避免请求过快
         
