@@ -1,8 +1,6 @@
 import os
 import requests
 import time
-from datetime import datetime
-import pytz
 import asyncio
 from telegram import Bot
 
@@ -42,29 +40,39 @@ def format_hot_data(data_list, url_key):
         title = item.get("title", "无标题")
         link = item.get(url_key, "#")
         hot = item.get("hot", "无热度")
-        formatted.append(f"{index}. [{title}]({link}) **{hot}🔥**")
+        formatted.append(f"{index}. [{title}]({link}) (热度: {hot})")
     return formatted
 
 async def send_to_telegram(platform, formatted_data):
     """发送数据到 Telegram 频道"""
     # 发送前5项
     top_five = formatted_data[:5]
-    message = f"*{platform}*热搜榜单\n" + "\n".join(top_five)
+    message = f"**{platform} 热搜榜单**\n" + "\n".join(top_five)
     sent_message = await bot.send_message(chat_id=TELEGRAM_CHANNEL_ID, text=message, parse_mode='Markdown')
 
     # 等待一段时间以确保消息被转发
-    await asyncio.sleep(6)
-    sent_time = sent_message.date.timestamp()  # 获取发送时间的时间戳
+    await asyncio.sleep(2)
 
     # 获取群组中的最新消息
     updates = await bot.get_updates()
     forwarded_message_id = None
+    sent_time = sent_message.date.timestamp()  # 获取发送时间的时间戳
 
     # 查找最近的转发消息
     for update in updates:
-        if update.message and update.message.chat.id == int(TELEGRAM_GROUP_ID) and update.message.date.timestamp() > sent_time and update.message.is_automatic_forward:
-            forwarded_message_id = update.message.message_id
-            break
+        print(1)
+        print(update.message)
+        if update.message and update.message.chat.id == int(TELEGRAM_GROUP_ID):
+            print(2)
+            print(update.message)
+            # 检查消息时间戳是否在发送时间之后
+            if update.message.date.timestamp() > sent_time:
+                print(2)
+                print(update.message)
+                # 检查消息内容是否包含平台名称
+                if update.message.is_automatic_forward:
+                    forwarded_message_id = update.message.message_id
+                    break
 
     if forwarded_message_id is None:
         print("未找到转发的消息 ID")
@@ -75,17 +83,16 @@ async def send_to_telegram(platform, formatted_data):
         group = formatted_data[i:i+5]
         comment_message = "\n".join(group)
         await bot.send_message(chat_id=TELEGRAM_GROUP_ID, text=comment_message, parse_mode='Markdown', reply_to_message_id=forwarded_message_id)
-        await asyncio.sleep(4)  # 避免请求过快
+        await asyncio.sleep(1)  # 避免请求过快
 
 async def main():
-
     for platform in PLATFROMS:
         print(f"正在获取：{platform[0]}")
         data = fetch_hot_data(platform[0])
         if data:
             formatted = format_hot_data(data, platform[1])
             await send_to_telegram(platform[0], formatted)
-        await asyncio.sleep(5)  # 避免请求过快
+        await asyncio.sleep(1)  # 避免请求过快
 
 if __name__ == "__main__":
     asyncio.run(main())
