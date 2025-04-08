@@ -97,6 +97,7 @@ async def main():
     current_time = datetime.now(tz).strftime("%Y-%m-%d %H:%M")
     init_message = await bot.send_message(chat_id=TELEGRAM_CHANNEL_ID, text=f"北京时间: {current_time}", parse_mode='Markdown')
     await bot.pin_chat_message(chat_id=TELEGRAM_CHANNEL_ID, message_id=init_message.message_id)
+    await asyncio.sleep(2.5)  # 避免请求过快
 
     for platform in PLATFROMS:
         print(f"正在获取：{platform[0]}")
