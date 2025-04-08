@@ -9,7 +9,7 @@ from telegram import Bot
 # 配置信息
 API_BASE_URL = "https://api.pearktrue.cn/api/dailyhot/"
 PLATFROMS = [
-    ["百度", "url"], ["微博", "url"], ["百度贴吧", "url"], ["少数派", "url"], ["IT之家", "url"], ["腾讯新闻", "url"], ["澎湃新闻", "url"], ["今日头条", "url"], ["36氪", "url"], ["稀土掘金", "mobileUrl"], ["知乎", "url"]
+    ["百度", "url"], ["微博", "url"], ["百度贴吧", "url"], ["少数派", "url"], ["IT之家", "url"], ["腾讯新闻", "url"], ["今日头条", "url"], ["36氪", "url"], ["稀土掘金", "mobileUrl"], ["知乎", "url"], ["澎湃新闻", "url"], ["bilibili", "mobileUrl"]
 ]
 
 TELEGRAM_BOT_TOKEN = os.environ["BOT_TOKEN"]
