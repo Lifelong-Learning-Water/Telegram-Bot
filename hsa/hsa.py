@@ -46,7 +46,7 @@ def format_hot_data(data_list, url_key):
         title = item.get("title", "无标题")
         link = item.get(url_key, "#")
         hot = item.get("hot", "无热度")
-        formatted.append(f"{index}. [{title}]({link}) {hot}🔥")
+        formatted.append(f"{index}. [{title}]({link})_{hot}🔥_")
     return formatted
 
 async def send_to_telegram(platform, formatted_data):
@@ -99,7 +99,7 @@ async def send_to_telegram(platform, formatted_data):
 async def main():
     tz = pytz.timezone('Asia/Shanghai')
     current_time = datetime.now(tz).strftime("%Y-%m-%d %H:%M")
-    init_message = await bot.send_message(chat_id=TELEGRAM_CHANNEL_ID, text=f"北京时间: {current_time}", parse_mode='Markdown')
+    init_message = await bot.send_message(chat_id=TELEGRAM_CHANNEL_ID, text=f"*__北京时间: {current_time}__*", parse_mode='Markdown')
     await bot.pin_chat_message(chat_id=TELEGRAM_CHANNEL_ID, message_id=init_message.message_id)
     await asyncio.sleep(2.5)  # 避免请求过快
 
