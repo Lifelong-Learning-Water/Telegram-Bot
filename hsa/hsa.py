@@ -47,11 +47,11 @@ async def send_to_telegram(platform, formatted_data):
     # 发送前5项
     top_five = formatted_data[:5]
     message = f"**{platform} 热搜榜单**\n" + "\n".join(top_five)
-    sent_time = sent_message.date.timestamp()  # 获取发送时间的时间戳
     sent_message = await bot.send_message(chat_id=TELEGRAM_CHANNEL_ID, text=message, parse_mode='Markdown')
 
     # 等待一段时间以确保消息被转发
     await asyncio.sleep(2)
+    sent_time = sent_message.date.timestamp()  # 获取发送时间的时间戳
 
     # 获取群组中的最新消息
     updates = await bot.get_updates()
