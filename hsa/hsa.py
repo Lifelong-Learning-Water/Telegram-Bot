@@ -78,8 +78,9 @@ async def send_to_telegram(platform, formatted_data):
 
 async def main():
     # 发送当前时间
-    current_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    current_time = datetime.now().strftime("%Y-%m-%d %H:%M")
     await bot.send_message(chat_id=TELEGRAM_CHANNEL_ID, text=f"当前时间: {current_time}", parse_mode='Markdown')
+    await asyncio.sleep(3)
 
     for platform in PLATFROMS:
         print(f"正在获取：{platform[0]}")
