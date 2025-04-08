@@ -64,6 +64,7 @@ async def send_to_telegram(platform, formatted_data):
             if update.message.date.timestamp() >= sent_time:
                 print(update.message)
                 if update.message.is_automatic_forward:
+                    print(update.message)
                     forwarded_message_id = update.message.message_id
                     break
 
