@@ -61,14 +61,13 @@ async def send_to_telegram(platform, formatted_data):
     # 查找最近的转发消息
     for update in updates:
         print(1)
-        print(update.message.date.timestamp() )
         if update.message and update.message.chat.id == int(TELEGRAM_GROUP_ID):
             print(2)
-            print(update.message.date.timestamp() )
+            print(update.message.date.timestamp())
             # 检查消息时间戳是否在发送时间之后
             if update.message.date.timestamp() > sent_time:
-                print(2)
-                print(update.message.date.timestamp() )
+                print(3)
+                print(update.message.is_automatic_forward)
                 # 检查消息内容是否包含平台名称
                 if update.message.is_automatic_forward:
                     forwarded_message_id = update.message.message_id
