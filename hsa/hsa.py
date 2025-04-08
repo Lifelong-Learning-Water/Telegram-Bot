@@ -1,6 +1,8 @@
 import os
 import requests
 import time
+import datetime from datetime
+import pytz
 import asyncio
 from telegram import Bot
 
@@ -40,18 +42,18 @@ def format_hot_data(data_list, url_key):
         title = item.get("title", "无标题")
         link = item.get(url_key, "#")
         hot = item.get("hot", "无热度")
-        formatted.append(f"{index}. [{title}]({link}) (热度: {hot})")
+        formatted.append(f"{index}. [{title}]({link}) {hot}🔥")
     return formatted
 
 async def send_to_telegram(platform, formatted_data):
     """发送数据到 Telegram 频道"""
     # 发送前5项
     top_five = formatted_data[:5]
-    message = f"**{platform} 热搜榜单**\n" + "\n".join(top_five)
+    message = f"*{platform}* 热搜榜单\n" + "\n".join(top_five)
     sent_message = await bot.send_message(chat_id=TELEGRAM_CHANNEL_ID, text=message, parse_mode='Markdown')
 
     # 等待一段时间以确保消息被转发
-    await asyncio.sleep(10)
+    await asyncio.sleep(4)
 
     # 获取群组中的最新消息
     offset = 0  # 初始化 offset
@@ -91,6 +93,10 @@ async def send_to_telegram(platform, formatted_data):
         await asyncio.sleep(2.5)  # 避免请求过快
 
 async def main():
+    tz = pytz.timezone('Asia/Shanghai')
+    current_time = datetime.now(tz).strftime("%Y-%m-%d %H:%M")
+    await bot.send_message(chat_id=TELEGRAM_CHANNEL_ID, text=f"北京时间: {current_time}", parse_mode='Markdown')
+
     for platform in PLATFROMS:
         print(f"正在获取：{platform[0]}")
         data = fetch_hot_data(platform[0])
