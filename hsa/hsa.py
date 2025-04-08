@@ -42,14 +42,14 @@ def format_hot_data(data_list, url_key):
         title = item.get("title", "无标题")
         link = item.get(url_key, "#")
         hot = item.get("hot", "无热度")
-        formatted.append(f"{index}. [{title}]({link}) *{hot}🔥*")
+        formatted.append(f"{index}. [{title}]({link}) **{hot}🔥**")
     return formatted
 
 async def send_to_telegram(platform, formatted_data):
     """发送数据到 Telegram 频道"""
     # 发送前5项
     top_five = formatted_data[:5]
-    message = f"**{platform} 热搜榜单**\n" + "\n".join(top_five)
+    message = f"*{platform}*热搜榜单\n" + "\n".join(top_five)
     sent_message = await bot.send_message(chat_id=TELEGRAM_CHANNEL_ID, text=message, parse_mode='Markdown')
 
     # 等待一段时间以确保消息被转发
