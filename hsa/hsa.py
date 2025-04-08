@@ -63,6 +63,8 @@ async def send_to_telegram(platform, formatted_data):
         if update.message and update.message.chat.id == int(TELEGRAM_GROUP_ID):
             print(1)
             print(update.message)
+            print(sent_time)
+            print(update.message.date.timestamp())
             # 检查消息时间戳是否在发送时间之后
             if update.message.date.timestamp() >= sent_time:
                 print(2)
