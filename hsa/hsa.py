@@ -4,8 +4,8 @@ import time
 # 配置信息
 API_BASE_URL = "https://api.pearktrue.cn/api/dailyhot/"
 PLATFROMS = [
-    ["百度", "url"], ["知乎"], ["百度贴吧"], ["少数派"], ["IT之家"],
-    ["澎湃新闻"], ["今日头条"], ["36氪"], ["稀土掘金"], ["腾讯新闻"]
+    ["百度", "url"], ["知乎", "url"], ["百度贴吧", "url"], ["少数派", "url"], ["IT之家", "url"],
+    ["澎湃新闻", "url"], ["今日头条", "url"], ["36氪", "url"], ["稀土掘金", "url"], ["腾讯新闻", "url"]
 ]
 
 def fetch_hot_data(platform):
