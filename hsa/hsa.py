@@ -47,6 +47,7 @@ async def send_to_telegram(platform, formatted_data):
     # 发送前5项
     top_five = formatted_data[:5]
     message = f"**{platform} 热搜榜单**\n" + "\n".join(top_five)
+    sent_time = sent_message.date.timestamp()  # 获取发送时间的时间戳
     sent_message = await bot.send_message(chat_id=TELEGRAM_CHANNEL_ID, text=message, parse_mode='Markdown')
 
     # 等待一段时间以确保消息被转发
@@ -55,7 +56,6 @@ async def send_to_telegram(platform, formatted_data):
     # 获取群组中的最新消息
     updates = await bot.get_updates()
     forwarded_message_id = None
-    sent_time = sent_message.date.timestamp()  # 获取发送时间的时间戳
 
     # 查找最近的转发消息
     for update in updates:
@@ -64,7 +64,7 @@ async def send_to_telegram(platform, formatted_data):
             print(1)
             print(update.message)
             # 检查消息时间戳是否在发送时间之后
-            if True:
+            if update.message.date.timestamp() >= sent_time:
                 print(2)
                 print(update.message)
                 if update.message.is_automatic_forward:
