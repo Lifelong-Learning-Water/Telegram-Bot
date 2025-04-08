@@ -2,7 +2,7 @@ name: Run the hsa bot
 
 on:
   schedule:
-    - cron: '0 */3 * * *'
+    - cron: '0 */4 * * *'
   workflow_dispatch:
 
 jobs:
