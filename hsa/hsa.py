@@ -41,7 +41,7 @@ def format_hot_data(data_list, url_key):
         formatted.append(f"- [{title}]({link}) (热度: {hot})")
     return formatted
 
-def send_to_telegram(platform, formatted_data):
+async def send_to_telegram(platform, formatted_data):
     """发送数据到 Telegram 频道"""
     # 发送前5项
     top_five = formatted_data[:5]
