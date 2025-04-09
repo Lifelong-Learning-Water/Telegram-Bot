@@ -73,7 +73,7 @@ async def fetch_news_data(source=None, category=None):
 async def translate_text(text):
     """调用翻译 API 翻译文本"""
     url = f"https://v.api.aa1.cn/api/api-fanyi-yd/index.php?msg={text}&type=2"
-    translated_data = await fetch_data(text, {})
+    translated_data = await fetch_data(url, {})
     if translated_data and 'text' in translated_data:
         return translated_data['text']
     print(f"翻译错误：{text}")
