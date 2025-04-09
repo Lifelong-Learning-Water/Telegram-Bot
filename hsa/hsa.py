@@ -130,14 +130,14 @@ async def send_to_telegram(platform, formatted_data):
         group = formatted_data[i:i + 5]
         comment_message = "\n".join(group)
         await bot.send_message(chat_id=TELEGRAM_GROUP_ID, text=comment_message, parse_mode='HTML', reply_to_message_id=forwarded_message_id)
-        await asyncio.sleep(2.5)
+        await asyncio.sleep(2)
 
 async def main():
     tz = pytz.timezone('Asia/Shanghai')
     current_time = datetime.now(tz).strftime("%Y-%m-%d %H:%M")
     init_message = await bot.send_message(chat_id=TELEGRAM_CHANNEL_ID, text=f"北京时间: <b>{current_time}</b>", parse_mode='HTML')
     await bot.pin_chat_message(chat_id=TELEGRAM_CHANNEL_ID, message_id=init_message.message_id)
-    await asyncio.sleep(2.5)
+    await asyncio.sleep(2)
 
     for media in FOREIGN_MEDIA:
         print(f"正在获取：{media[0]}")
@@ -145,7 +145,7 @@ async def main():
         if articles:
             formatted_news = format_data(articles, 'url', is_news=True)
             await send_to_telegram(media[0], formatted_news)
-        await asyncio.sleep(2.5)
+        await asyncio.sleep(2)
 
     for category in CATEGORIES:
         print(f"正在获取：{category[0]}")
@@ -153,7 +153,7 @@ async def main():
         if articles:
             formatted_news = format_data(articles, 'url', is_news=True)
             await send_to_telegram(category[0], formatted_news)
-        await asyncio.sleep(2.5)
+        await asyncio.sleep(2)
 
     for platform in PLATFROMS:
         print(f"正在获取：{platform[0]}")
@@ -161,7 +161,7 @@ async def main():
         if data:
             formatted = format_data(data, platform[1])
             await send_to_telegram(platform[0], formatted)
-        await asyncio.sleep(2.5)
+        await asyncio.sleep(2)
 
 if __name__ == "__main__":
     asyncio.run(main())
