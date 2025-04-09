@@ -70,7 +70,8 @@ def format_data(data_list, url_key, is_news=False):
     """格式化数据为可读文本，并添加序号"""
     return [
         f"{index + 1}. [{item.get('title', '无标题')}]({item.get(url_key, '#')})" +
-        (f"_{item.get('hot', '无热度')}🔥_" if not is_news else "")
+        (f"_{item.get('hot', '无热度')}🔥_" if not is_news else "") +
+        (f"\n_{item.get('desc', '无摘要')}_")
         for index, item in enumerate(data_list)
     ]
 
