@@ -72,7 +72,7 @@ async def fetch_news_data(source=None, category=None):
 
 async def translate_text(text):
     """调用翻译 API 翻译文本"""
-    url = f"https://findmyip.net/api/translate.php/text={text}"
+    url = f"https://findmyip.net/api/translate.php?text={text}"
     translated_data = await fetch_data(data, {})
     if translated_data and 'translate_result' in translated_data:
         return translated_data['translate_result']
