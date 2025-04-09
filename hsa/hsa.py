@@ -8,6 +8,8 @@ from telegram import Bot
 
 # 配置信息
 API_BASE_URL = "https://api.pearktrue.cn/api/dailyhot/"
+NEWS_API_URL = "https://newsapi.org/v2/top-headlines"
+NEWS_API_KEY = os.environ["NEWS_API_KEY"]  # 你的 News API 密钥
 PLATFROMS = [
     ["百度", "url"], ["微博", "url"],
     ["百度贴吧", "url"], ["少数派", "url"],
@@ -15,6 +17,13 @@ PLATFROMS = [
     ["今日头条", "url"], ["36氪", "url"],
     ["稀土掘金", "mobileUrl"], ["知乎", "url"],
     ["哔哩哔哩", "mobileUrl"], ["澎湃新闻", "url"]
+]
+
+# 新增国外媒体
+FOREIGN_MEDIA = [
+    ["BBC", "bbc.co.uk"], ["路透社", "reuters.com"],
+    ["彭博社", "bloomberg.com"], ["法新社", "afp.com"],
+    ["纽约时报", "nytimes.com"]
 ]
 
 TELEGRAM_BOT_TOKEN = os.environ["BOT_TOKEN"]
@@ -39,6 +48,26 @@ def fetch_hot_data(platform):
         print(f"错误：请求{platform}时发生异常：{str(e)}")
         return []
 
+def fetch_news_data(source):
+    """获取指定来源的新闻数据"""
+    params = {
+        'apiKey': NEWS_API_KEY,
+        'sources': source,
+        'pageSize': 5  # 只获取前5条新闻
+    }
+    try:
+        response = requests.get(NEWS_API_URL, params=params, timeout=10)
+        response.raise_for_status()
+        data = response.json()
+        if data.get("status") == "ok":
+            return data.get("articles", [])
+        else:
+            print(f"警告：{source} API返回错误：{data.get('message')}")
+            return []
+    except requests.exceptions.RequestException as e:
+        print(f"错误：请求{source}时发生异常：{str(e)}")
+        return []
+
 def format_hot_data(data_list, url_key):
     """格式化数据为可读文本，并添加序号"""
     formatted = []
@@ -47,6 +76,15 @@ def format_hot_data(data_list, url_key):
         link = item.get(url_key, "#")
         hot = item.get("hot", "无热度")
         formatted.append(f"{index}. [{title}]({link})_{hot}🔥_")
+    return formatted
+
+def format_news_data(articles):
+    """格式化新闻数据为可读文本"""
+    formatted = []
+    for index, article in enumerate(articles, start=1):
+        title = article.get("title", "无标题")
+        link = article.get("url", "#")
+        formatted.append(f"{index}. [{title}]({link})")
     return formatted
 
 async def send_to_telegram(platform, formatted_data):
@@ -109,6 +147,14 @@ async def main():
         if data:
             formatted = format_hot_data(data, platform[1])
             await send_to_telegram(platform[0], formatted)
+        await asyncio.sleep(2.5)  # 避免请求过快
+
+    for media in FOREIGN_MEDIA:
+        print(f"正在获取：{media[0]}")
+        articles = fetch_news_data(media[1])
+        if articles:
+            formatted_news = format_news_data(articles)
+            await send_to_telegram(media[0], formatted_news)
         await asyncio.sleep(2.5)  # 避免请求过快
 
 if __name__ == "__main__":
