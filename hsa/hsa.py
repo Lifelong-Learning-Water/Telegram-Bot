@@ -137,8 +137,8 @@ async def send_to_telegram(platform, formatted_data):
 async def main():
     tz = pytz.timezone('Asia/Shanghai')
     current_time = datetime.now(tz).strftime("%Y-%m-%d %H:%M")
-    # init_message = await bot.send_message(chat_id=TELEGRAM_CHANNEL_ID, text=f"__北京时间: {current_time}__", parse_mode='Markdown')
-    # await bot.pin_chat_message(chat_id=TELEGRAM_CHANNEL_ID, message_id=init_message.message_id)
+    init_message = await bot.send_message(chat_id=TELEGRAM_CHANNEL_ID, text=f"__北京时间: {current_time}__", parse_mode='Markdown')
+    await bot.pin_chat_message(chat_id=TELEGRAM_CHANNEL_ID, message_id=init_message.message_id)
     await asyncio.sleep(2.5)  # 避免请求过快
 
     for platform in PLATFROMS:
@@ -146,7 +146,7 @@ async def main():
         data = fetch_hot_data(platform[0])
         if data:
             formatted = format_hot_data(data, platform[1])
-            # await send_to_telegram(platform[0], formatted)
+            await send_to_telegram(platform[0], formatted)
         await asyncio.sleep(2.5)  # 避免请求过快
 
     for media in FOREIGN_MEDIA:
@@ -154,7 +154,7 @@ async def main():
         articles = fetch_news_data(media[1])
         if articles:
             formatted_news = format_news_data(articles)
-            # await send_to_telegram(media[0], formatted_news)
+            await send_to_telegram(media[0], formatted_news)
         await asyncio.sleep(2.5)  # 避免请求过快
 
 if __name__ == "__main__":
