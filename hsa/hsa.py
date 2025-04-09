@@ -72,15 +72,13 @@ def format_data(data_list, url_key, is_news=False):
     for index, item in enumerate(data_list):
         title = item.get('title', '无标题')
         url = item.get(url_key, '#')
-
         hot_info = f"_{item.get('hot', '无热度')}🔥_" if not is_news and item.get('hot') else ""        
-
         desc = f"\n_{item.get('desc', '无摘要')}_ " if item.get('desc') else ""
 
         formatted_string = f"{index + 1}. [{title}]({url}){hot_info}{desc}".strip()
         formatted_data.append(formatted_string)
 
-    return formatted_data 
+    return formatted_data
 
 async def send_to_telegram(platform, formatted_data):
     """发送数据到 Telegram 频道"""
