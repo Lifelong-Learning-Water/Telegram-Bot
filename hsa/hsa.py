@@ -74,7 +74,6 @@ def fetch_news_data_category(category):
     """获取指定来源的新闻数据"""
     params = {
         'apiKey': NEWS_API_KEY,
-        'country': 'cn',
         'category': category,
         'pageSize': 20
     }
