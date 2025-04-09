@@ -69,7 +69,7 @@ async def fetch_news_data(source=None, category=None):
 def format_data(data_list, url_key, is_news=False):
     """格式化数据为可读文本，并添加序号""" 
     formatted_data = []
-    for index, item in enumerate(data_list):
+    for index, item in enumerate(data_list, start=1):
         title = item.get('title', '无标题')
         url = item.get(url_key, '#')
         hot_info = f"_{item.get('hot')}🔥_" if not is_news and item.get('hot') else ""
@@ -80,7 +80,7 @@ def format_data(data_list, url_key, is_news=False):
         else:
             desc = ''
 
-        formatted_string = f"{index + 1}. [{title}]({url}){hot_info}{desc}".strip()
+        formatted_string = f"{index}. [{title}]({url}){hot_info}{desc}".strip()
         formatted_data.append(formatted_string)
 
     return formatted_data
