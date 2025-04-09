@@ -14,8 +14,8 @@ PLATFROMS = [
     ["百度贴吧", "url"], ["少数派", "url"],
     ["IT之家", "url"], ["腾讯新闻", "url"],
     ["今日头条", "url"], ["36氪", "url"],
-    ["哔哩哔哩", "mobileUrl"], ["澎湃新闻", "url"]
-    ["稀土掘金", "mobileUrl"], ["知乎", "url"],
+    ["哔哩哔哩", "mobileUrl"], ["澎湃新闻", "url"],
+    ["稀土掘金", "mobileUrl"], ["知乎", "url"]
 ]
 
 FOREIGN_MEDIA = [
