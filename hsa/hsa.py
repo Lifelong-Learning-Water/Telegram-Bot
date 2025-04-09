@@ -51,7 +51,7 @@ def fetch_news_data(source):
     params = {
         'apiKey': NEWS_API_KEY,
         'sources': source,
-        'pageSize': 5  # 只获取前5条新闻
+        'pageSize': 20
     }
     try:
         response = requests.get(NEWS_API_URL, params=params, timeout=10)
