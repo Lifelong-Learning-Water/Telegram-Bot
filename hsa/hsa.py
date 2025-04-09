@@ -86,6 +86,7 @@ def format_news_data(articles):
         title = article.get("title", "无标题")
         link = article.get("url", "#")
         formatted.append(f"{index}. [{title}]({link})")
+    print(formatted)
     return formatted
 
 async def send_to_telegram(platform, formatted_data):
