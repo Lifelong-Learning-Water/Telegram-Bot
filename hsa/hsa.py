@@ -119,14 +119,6 @@ async def main():
     await bot.pin_chat_message(chat_id=TELEGRAM_CHANNEL_ID, message_id=init_message.message_id)
     await asyncio.sleep(2.5)
 
-    for platform in PLATFROMS:
-        print(f"正在获取：{platform[0]}")
-        data = await fetch_hot_data(platform[0])
-        if data:
-            formatted = format_data(data, platform[1])
-            await send_to_telegram(platform[0], formatted)
-        await asyncio.sleep(2.5)
-
     for media in FOREIGN_MEDIA:
         print(f"正在获取：{media[0]}")
         articles = await fetch_news_data(source=media[1])
@@ -135,12 +127,20 @@ async def main():
             await send_to_telegram(media[0], formatted_news)
         await asyncio.sleep(2.5)
 
-    for media in CATEGORIES:
-        print(f"正在获取：{media[0]}")
-        articles = await fetch_news_data(category=media[1])
+    for category in CATEGORIES:
+        print(f"正在获取：{category[0]}")
+        articles = await fetch_news_data(category=category[1])
         if articles:
             formatted_news = format_data(articles, 'url', is_news=True)
-            await send_to_telegram(media[0], formatted_news)
+            await send_to_telegram(category[0], formatted_news)
+        await asyncio.sleep(2.5)
+
+    for platform in PLATFROMS:
+        print(f"正在获取：{platform[0]}")
+        data = await fetch_hot_data(platform[0])
+        if data:
+            formatted = format_data(data, platform[1])
+            await send_to_telegram(platform[0], formatted)
         await asyncio.sleep(2.5)
 
 if __name__ == "__main__":
