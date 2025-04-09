@@ -28,7 +28,6 @@ CATEGORIES = [
     ["商业", "business"], ["科学", "science"], ["技术", "technology"]
 ]
 
-technology
 TELEGRAM_BOT_TOKEN = os.environ["BOT_TOKEN"]
 TELEGRAM_CHANNEL_ID = '@hot_search_aggregation'
 TELEGRAM_GROUP_ID = '-1002699038758'
