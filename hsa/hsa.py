@@ -78,7 +78,7 @@ def format_data(data_list, url_key, is_news=False):
         desc = f"\n_{item.get('desc', '无摘要')}_ " if item.get('desc') else ""
 
         formatted_string = f"{index + 1}. [{title}]({url}){hot_info}{desc}".strip()
-         formatted_data.append(formatted_string)
+        formatted_data.append(formatted_string)
 
     return formatted_data 
 
