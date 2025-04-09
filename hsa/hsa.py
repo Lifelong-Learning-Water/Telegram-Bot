@@ -1,3 +1,4 @@
+ 
 import os
 import asyncio
 import aiohttp
@@ -14,8 +15,8 @@ PLATFROMS = [
     ["百度贴吧", "url"], ["少数派", "url"],
     ["IT之家", "url"], ["腾讯新闻", "url"],
     ["今日头条", "url"], ["36氪", "url"],
-    ["哔哩哔哩", "mobileUrl"], ["澎湃新闻", "url"],
-    ["稀土掘金", "mobileUrl"], ["知乎", "url"]
+    ["稀土掘金", "mobileUrl"], ["知乎", "url"],
+    ["哔哩哔哩", "mobileUrl"], ["澎湃新闻", "url"]
 ]
 
 FOREIGN_MEDIA = [
@@ -31,6 +32,10 @@ TELEGRAM_CHANNEL_ID = '@hot_search_aggregation'
 TELEGRAM_GROUP_ID = '-1002699038758'
 
 bot = Bot(token=TELEGRAM_BOT_TOKEN)
+
+def escape_markdown(text):
+    """转义 Markdown 特殊字符"""
+    return text.replace('_', '\\_').replace('*', '\\*').replace('[', '\\[').replace(']', '\\]').replace('(', '\\(').replace(')', '\\)').replace('~', '\\~').replace('`', '\\`').replace('>', '\\>').replace('#', '\\#').replace('+', '\\+').replace('-', '\\-').replace('=', '\\=').replace('|', '\\|').replace('{', '\\{').replace('}', '\\}').replace('.', '\\.').replace('!', '\\!')
 
 async def fetch_data(url, params):
     """异步获取数据"""
@@ -70,17 +75,22 @@ def format_data(data_list, url_key, is_news=False):
     """格式化数据为可读文本，并添加序号""" 
     formatted_data = []
     for index, item in enumerate(data_list, start=1):
-        title = item.get('title', '无标题')
+        title = escape_markdown(item.get('title', '无标题'))
         url = item.get(url_key, '#')
         hot_info = f"_{item.get('hot')}🔥_" if not is_news and item.get('hot') else ""
+        
+        # 控制描述不超过25个字符
         if is_news:
-            desc = f"\n\n{item.get('description')}\n"
+            desc = item.get('description', '')
         elif item.get('desc'):
-            desc = f"\n\n{item.get('desc')}\n"
+            desc = item.get('desc')
         else:
             desc = ''
 
-        formatted_string = f"{index}. [{title}]({url}){hot_info}{desc}"
+        if desc and len(desc) > 30:
+            desc = desc[:30] + '...'
+
+        formatted_string = f"{index}. [{title}]({url}){hot_info}\n{escape_markdown(desc)}".strip()
         formatted_data.append(formatted_string)
 
     return formatted_data
@@ -88,7 +98,7 @@ def format_data(data_list, url_key, is_news=False):
 async def send_to_telegram(platform, formatted_data):
     """发送数据到 Telegram 频道"""
     top_five = formatted_data[:5]
-    message = f"*{platform}* 热搜榜单\n" + "\n".join(top_five)
+    message = f"*{escape_markdown(platform)}* 热搜榜单\n" + "\n".join(top_five)
     sent_message = await bot.send_message(chat_id=TELEGRAM_CHANNEL_ID, text=message, parse_mode='Markdown')
 
     await asyncio.sleep(4)
@@ -156,3 +166,4 @@ async def main():
 
 if __name__ == "__main__":
     asyncio.run(main())
+ 
