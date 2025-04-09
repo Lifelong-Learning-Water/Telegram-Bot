@@ -80,7 +80,7 @@ def format_data(data_list, url_key, is_news=False):
         else:
             desc = ''
 
-        formatted_string = f"{index}. *[{title}]({url})*_{hot_info}_\n{desc}\n"
+        formatted_string = f"{index}. [*{title}*]({url})_{hot_info}_\n{desc}\n"
         formatted_data.append(formatted_string)
 
     return formatted_data
