@@ -72,15 +72,15 @@ def format_data(data_list, url_key, is_news=False):
     for index, item in enumerate(data_list, start=1):
         title = item.get('title', '无标题')
         url = item.get(url_key, '#')
-        hot_info = f"_{item.get('hot')}🔥_" if not is_news and item.get('hot') else ""
+        hot_info = f"{item.get('hot')}" if not is_news and item.get('hot') else ""
         if is_news:
-            desc = f"```\n{item.get('description')}\n```"
+            desc = f"{item.get('description')}"
         elif item.get('desc'):
-            desc = f"```\n{item.get('desc')}\n```"
+            desc = f"{item.get('desc')}"
         else:
             desc = ''
 
-        formatted_string = f"{index}. [{title}]({url}){hot_info}{desc}".strip()
+        formatted_string = f"{index}. *[{title}]({url})*_{hot_info}_\n{desc}\n"
         formatted_data.append(formatted_string)
 
     return formatted_data
