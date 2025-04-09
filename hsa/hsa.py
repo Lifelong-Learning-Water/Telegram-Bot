@@ -72,10 +72,10 @@ async def fetch_news_data(source=None, category=None):
 
 async def translate_text(text):
     """调用翻译 API 翻译文本"""
-    url = f"https://findmyip.net/api/translate.php?text={text}"
-    translated_data = await fetch_data(data, {})
-    if translated_data and 'translate_result' in translated_data:
-        return translated_data['translate_result']
+    url = f"https://findmyip.net/api/translate.php/text={text}"
+    translated_data = await fetch_data(url, {})
+    if translated_data and 'translated_text' in translated_data:
+        return translated_data['translated_text']
     print(f"翻译错误：{text}")
     return text  # 如果翻译失败，返回原文本
 
@@ -83,12 +83,12 @@ async def format_data(data_list, url_key, is_news=False):
     """格式化数据为可读文本，并添加序号""" 
     formatted_data = []
     for index, item in enumerate(data_list, start=1):
-        title = escape_html(item.get('title', '无标题'))
+        title = escape_html(item.get('title', '无标题')) if not is_news else translate_text(escape_html(item.get('title', '无标题')))
         url = item.get(url_key, '#')
         hot_info = f"<i>{item.get('hot')}🔥</i>" if not is_news and item.get('hot') else ""
 
         if is_news:
-            desc = item.get('description', '')
+            desc = translate_text(item.get('description', ''))
         elif item.get('desc'):
             desc = item.get('desc')
         else:
@@ -97,11 +97,7 @@ async def format_data(data_list, url_key, is_news=False):
         if desc:
             desc = "\n\n" + escape_html(desc) + "\n"
 
-        # 翻译标题和描述
-        translated_title = await translate_text(title)
-        translated_desc = await translate_text(desc) if desc else ''
-
-        formatted_string = f"{index}. <a href=\"{url}\">{translated_title}</a>{hot_info}{translated_desc}"
+        formatted_string = f"{index}. <a href=\"{url}\">{title}</a>{hot_info}{desc}"
         formatted_data.append(formatted_string)
 
     return formatted_data
