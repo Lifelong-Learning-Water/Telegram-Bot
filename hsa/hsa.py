@@ -89,7 +89,7 @@ def format_data(data_list, url_key, is_news=False):
         if desc:
             if len(desc) > 30:
                 desc = desc[:30] + '...'
-            desc = "<br><br>" + desc + "<br>"
+            desc = "\n\n" + desc + "\n"
 
         formatted_string = f"{index}. <a href=\"{url}\">{title}</a>{hot_info}{desc}"
         formatted_data.append(formatted_string)
