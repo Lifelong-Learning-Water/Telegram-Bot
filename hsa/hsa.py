@@ -83,12 +83,12 @@ async def format_data(data_list, url_key, is_news=False):
     """格式化数据为可读文本，并添加序号""" 
     formatted_data = []
     for index, item in enumerate(data_list, start=1):
-        title = escape_html(item.get('title', '无标题')) if not is_news else escape_html(translate_text(item.get('title', '无标题')))
+        title = escape_html(item.get('title', '无标题')) if not is_news else escape_html(await translate_text(item.get('title', '无标题')))
         url = item.get(url_key, '#')
         hot_info = f"<i>{item.get('hot')}🔥</i>" if not is_news and item.get('hot') else ""
 
         if is_news:
-            desc = translate_text(item.get('description', ''))
+            desc = await translate_text(item.get('description', ''))
         elif item.get('desc'):
             desc = item.get('desc')
         else:
