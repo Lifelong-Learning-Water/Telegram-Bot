@@ -32,9 +32,9 @@ TELEGRAM_GROUP_ID = '-1002699038758'
 
 bot = Bot(token=TELEGRAM_BOT_TOKEN)
 
-def escape_markdown(text):
-    """转义 Markdown 特殊字符"""
-    return text.replace('_', '\\_').replace('*', '\\*').replace('[', '\\[').replace(']', '\\]').replace('(', '\\(').replace(')', '\\)').replace('~', '\\~').replace('`', '\\`').replace('>', '\\>').replace('#', '\\#').replace('+', '\\+').replace('-', '\\-').replace('=', '\\=').replace('|', '\\|').replace('{', '\\{').replace('}', '\\}').replace('.', '\\.').replace('!', '\\!')
+def escape_html(text):
+    """转义 HTML 特殊字符"""
+    return text.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;").replace('"', "&quot;").replace("'", "&apos;")
 
 async def fetch_data(url, params):
     """异步获取数据"""
@@ -74,24 +74,24 @@ def format_data(data_list, url_key, is_news=False):
     """格式化数据为可读文本，并添加序号""" 
     formatted_data = []
     for index, item in enumerate(data_list, start=1):
-        title = escape_markdown(item.get('title', '无标题'))
+        title = escape_html(item.get('title', '无标题'))
         url = item.get(url_key, '#')
-        hot_info = f"_{item.get('hot')}🔥_" if not is_news and item.get('hot') else ""
+        hot_info = f"<i>{item.get('hot')}🔥</i>" if not is_news and item.get('hot') else ""
         
         # 控制描述不超过25个字符
         if is_news:
-            desc = escape_markdown(item.get('description', ''))
+            desc = escape_html(item.get('description', ''))
         elif item.get('desc'):
-            desc = escape_markdown(item.get('desc'))
+            desc = escape_html(item.get('desc'))
         else:
             desc = ''
 
         if desc:
             if len(desc) > 30:
                 desc = desc[:30] + '...'
-            desc = "\n\n" + desc + "\n"
+            desc = "<br><br>" + desc + "<br>"
 
-        formatted_string = f"{index}. [{title}]({url}){hot_info}\n{escape_markdown(desc)}"
+        formatted_string = f"{index}. <a href=\"{url}\">{title}</a>{hot_info}{desc}"
         formatted_data.append(formatted_string)
 
     return formatted_data
@@ -99,8 +99,8 @@ def format_data(data_list, url_key, is_news=False):
 async def send_to_telegram(platform, formatted_data):
     """发送数据到 Telegram 频道"""
     top_five = formatted_data[:5]
-    message = f"*{escape_markdown(platform)}* 热搜榜单\n" + "\n".join(top_five)
-    sent_message = await bot.send_message(chat_id=TELEGRAM_CHANNEL_ID, text=message, parse_mode='Markdown')
+    message = f"<b>{escape_html(platform)}</b> 热搜榜单\n" + "\n".join(top_five)
+    sent_message = await bot.send_message(chat_id=TELEGRAM_CHANNEL_ID, text=message, parse_mode='HTML')
 
     await asyncio.sleep(4)
 
@@ -131,13 +131,13 @@ async def send_to_telegram(platform, formatted_data):
     for i in range(5, len(formatted_data), 5):
         group = formatted_data[i:i + 5]
         comment_message = "\n".join(group)
-        await bot.send_message(chat_id=TELEGRAM_GROUP_ID, text=comment_message, parse_mode='Markdown', reply_to_message_id=forwarded_message_id)
+        await bot.send_message(chat_id=TELEGRAM_GROUP_ID, text=comment_message, parse_mode='HTML', reply_to_message_id=forwarded_message_id)
         await asyncio.sleep(2.5)
 
 async def main():
     tz = pytz.timezone('Asia/Shanghai')
     current_time = datetime.now(tz).strftime("%Y-%m-%d %H:%M")
-    init_message = await bot.send_message(chat_id=TELEGRAM_CHANNEL_ID, text=f"__北京时间: {current_time}__", parse_mode='Markdown')
+    init_message = await bot.send_message(chat_id=TELEGRAM_CHANNEL_ID, text=f"北京时间: <b>{current_time}</b>", parse_mode='HTML')
     await bot.pin_chat_message(chat_id=TELEGRAM_CHANNEL_ID, message_id=init_message.message_id)
     await asyncio.sleep(2.5)
 
