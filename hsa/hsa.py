@@ -34,7 +34,7 @@ bot = Bot(token=TELEGRAM_BOT_TOKEN)
 
 def escape_html(text):
     """转义 HTML 特殊字符"""
-    return text.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;").replace('"', "&quot;").replace("'", "&apos;")
+    return text.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;")
 
 async def fetch_data(url, params):
     """异步获取数据"""
