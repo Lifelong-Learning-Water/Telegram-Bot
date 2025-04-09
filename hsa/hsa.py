@@ -9,7 +9,7 @@ from telegram import Bot
 # 配置信息
 API_BASE_URL = "https://api.pearktrue.cn/api/dailyhot/"
 NEWS_API_URL = "https://newsapi.org/v2/top-headlines"
-NEWS_API_KEY = os.environ["NEWS_API_KEY"]  # 你的 News API 密钥
+NEWS_API_KEY = os.environ["NEWS_API_KEY"]
 PLATFROMS = [
     ["百度", "url"], ["微博", "url"],
     ["百度贴吧", "url"], ["少数派", "url"],
@@ -19,13 +19,12 @@ PLATFROMS = [
     ["哔哩哔哩", "mobileUrl"], ["澎湃新闻", "url"]
 ]
 
-# 新增国外媒体
 FOREIGN_MEDIA = [
     ["BBC", "bbc-news"], ["彭博社", "bloomberg"]
 ]
 
 CATEGORIES = [
-    ["商业", "business"], ["科学", "science"], ["技术", "technology"]
+    ["商业", "business"], ["科学", "science"], ["技术", "technology"], ["综合", "general"]
 ]
 
 TELEGRAM_BOT_TOKEN = os.environ["BOT_TOKEN"]
@@ -75,6 +74,7 @@ def fetch_news_data_category(category):
     """获取指定来源的新闻数据"""
     params = {
         'apiKey': NEWS_API_KEY,
+        'country': 'zh'
         'category': category,
         'pageSize': 20
     }
