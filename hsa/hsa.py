@@ -80,16 +80,16 @@ def format_data(data_list, url_key, is_news=False):
         
         # 控制描述不超过25个字符
         if is_news:
-            desc = escape_html(item.get('description', ''))
+            desc = item.get('description', '')
         elif item.get('desc'):
-            desc = escape_html(item.get('desc'))
+            desc = item.get('desc')
         else:
             desc = ''
 
         if desc:
             if len(desc) > 30:
                 desc = desc[:30] + '...'
-            desc = "\n\n" + desc + "\n"
+            desc = "\n\n" + escape_html(desc) + "\n"
 
         formatted_string = f"{index}. <a href=\"{url}\">{title}</a>{hot_info}{desc}"
         formatted_data.append(formatted_string)
