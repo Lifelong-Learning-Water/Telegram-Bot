@@ -60,6 +60,7 @@ def fetch_news_data(source):
         response.raise_for_status()
         data = response.json()
         if data.get("status") == "ok":
+            print(data.get("articles", []))
             return data.get("articles", [])
         else:
             print(f"警告：{source} API返回错误：{data.get('message')}")
@@ -146,7 +147,7 @@ async def main():
         data = fetch_hot_data(platform[0])
         if data:
             formatted = format_hot_data(data, platform[1])
-            await send_to_telegram(platform[0], formatted)
+            # await send_to_telegram(platform[0], formatted)
         await asyncio.sleep(2.5)  # 避免请求过快
 
     for media in FOREIGN_MEDIA:
@@ -154,7 +155,7 @@ async def main():
         articles = fetch_news_data(media[1])
         if articles:
             formatted_news = format_news_data(articles)
-            await send_to_telegram(media[0], formatted_news)
+            # await send_to_telegram(media[0], formatted_news)
         await asyncio.sleep(2.5)  # 避免请求过快
 
 if __name__ == "__main__":
