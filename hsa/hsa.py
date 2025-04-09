@@ -21,9 +21,8 @@ PLATFROMS = [
 
 # 新增国外媒体
 FOREIGN_MEDIA = [
-    ["BBC", "bbc.co.uk"], ["路透社", "reuters.com"],
-    ["彭博社", "bloomberg.com"], ["法新社", "afp.com"],
-    ["纽约时报", "nytimes.com"]
+    ["BBC", "bbc-news"], ["路透社", "reuters"],
+    ["彭博社", "bloomberg"], ["谷歌新闻", "google-news"]
 ]
 
 TELEGRAM_BOT_TOKEN = os.environ["BOT_TOKEN"]
