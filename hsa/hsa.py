@@ -81,16 +81,18 @@ def format_data(data_list, url_key, is_news=False):
         
         # 控制描述不超过25个字符
         if is_news:
-            desc = item.get('description', '')
+            desc = escape_markdown(item.get('description', ''))
         elif item.get('desc'):
-            desc = item.get('desc')
+            desc = escape_markdown(item.get('desc'))
         else:
             desc = ''
 
-        if desc and len(desc) > 30:
-            desc = desc[:30] + '...'
+        if desc:
+            if len(desc) > 30:
+                desc = desc[:30] + '...'
+            desc = "\n\n" + desc + "\n"
 
-        formatted_string = f"{index}. [{title}]({url}){hot_info}\n{escape_markdown(desc)}".strip()
+        formatted_string = f"{index}. [{title}]({url}){hot_info}\n{escape_markdown(desc)}"
         formatted_data.append(formatted_string)
 
     return formatted_data
