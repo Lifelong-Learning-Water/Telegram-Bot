@@ -27,5 +27,6 @@ jobs:
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         BOT_TOKEN: ${{ secrets.BOT_TOKEN_HSA }}
+        NEWS_API_KEY: ${{ secrets.NEWS_API_KEY }}
       run: |
         python hsa/hsa.py
