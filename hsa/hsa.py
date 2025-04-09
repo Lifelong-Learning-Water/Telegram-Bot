@@ -21,9 +21,14 @@ PLATFROMS = [
 
 # 新增国外媒体
 FOREIGN_MEDIA = [
-    ["BBC", "bbc-news"], ["彭博社", "bloomberg"], ["谷歌新闻", "google-news"]
+    ["BBC", "bbc-news"], ["彭博社", "bloomberg"]
 ]
 
+CATEGORIES = [
+    ["商业", "business"], ["科学", "science"], ["技术", "technology"]
+]
+
+technology
 TELEGRAM_BOT_TOKEN = os.environ["BOT_TOKEN"]
 TELEGRAM_CHANNEL_ID = '@hot_search_aggregation'
 TELEGRAM_GROUP_ID = '-1002699038758'
@@ -51,6 +56,27 @@ def fetch_news_data(source):
     params = {
         'apiKey': NEWS_API_KEY,
         'sources': source,
+        'pageSize': 20
+    }
+    try:
+        response = requests.get(NEWS_API_URL, params=params, timeout=10)
+        response.raise_for_status()
+        data = response.json()
+        if data.get("status") == "ok":
+            print(data.get("articles", []))
+            return data.get("articles", [])
+        else:
+            print(f"警告：{source} API返回错误：{data.get('message')}")
+            return []
+    except requests.exceptions.RequestException as e:
+        print(f"错误：请求{source}时发生异常：{str(e)}")
+        return []
+
+def fetch_news_data_category(category):
+    """获取指定来源的新闻数据"""
+    params = {
+        'apiKey': NEWS_API_KEY,
+        'category': category,
         'pageSize': 20
     }
     try:
@@ -152,6 +178,14 @@ async def main():
     for media in FOREIGN_MEDIA:
         print(f"正在获取：{media[0]}")
         articles = fetch_news_data(media[1])
+        if articles:
+            formatted_news = format_news_data(articles)
+            await send_to_telegram(media[0], formatted_news)
+        await asyncio.sleep(2.5)  # 避免请求过快
+
+    for media in CATEGORIES:
+        print(f"正在获取：{media[0]}")
+        articles = fetch_news_data_category(media[1])
         if articles:
             formatted_news = format_news_data(articles)
             await send_to_telegram(media[0], formatted_news)
