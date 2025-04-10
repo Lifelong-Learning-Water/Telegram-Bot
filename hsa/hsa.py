@@ -108,10 +108,16 @@ async def format_data(data_list, url_key, is_news=False):
     return formatted_data
 
 async def send_to_telegram(platform, formatted_data):
-    """发送数据到 Telegram 频道"""
+    """发送数据到 Telegram 频道并记录消息 ID"""
     top_five = formatted_data[:5]
     message = f"<b>{escape_html(platform)}</b> 热搜榜单\n" + "\n\n".join(top_five)
     sent_message = await bot.send_message(chat_id=TELEGRAM_CHANNEL_ID, text=message, parse_mode='HTML')
+
+    # 记录发送的消息 ID 和对应的榜单名称
+    message_info = {
+        'id': sent_message.message_id,
+        'name': platform
+    }
 
     await asyncio.sleep(4)
 
@@ -137,13 +143,16 @@ async def send_to_telegram(platform, formatted_data):
 
     if forwarded_message_id is None:
         print("未找到转发的消息 ID")
-        return
+        return message_info  # 返回消息信息
 
     for i in range(5, len(formatted_data), 5):
         group = formatted_data[i:i + 5]
         comment_message = "\n\n".join(group)
         await bot.send_message(chat_id=TELEGRAM_GROUP_ID, text=comment_message, parse_mode='HTML', reply_to_message_id=forwarded_message_id)
         await asyncio.sleep(2)
+
+    # 返回记录的消息信息
+    return message_info
 
 async def main():
     tz = pytz.timezone('Asia/Shanghai')
@@ -152,12 +161,15 @@ async def main():
     await bot.pin_chat_message(chat_id=TELEGRAM_CHANNEL_ID, message_id=init_message.message_id)
     await asyncio.sleep(2)
 
+    all_message_info = []  # 用于记录所有热搜榜单的消息 ID 和名称
+
     for platform in PLATFROMS:
         print(f"正在获取：{platform[0]}")
         data = await fetch_hot_data(platform[0])
         if data:
             formatted = await format_data(data, platform[1])
-            await send_to_telegram(platform[0], formatted)
+            message_info = await send_to_telegram(platform[0], formatted)
+            all_message_info.append(message_info)  # 添加到总消息信息列表
         await asyncio.sleep(2)
 
     for media in FOREIGN_MEDIA:
@@ -165,7 +177,8 @@ async def main():
         articles = await fetch_news_data(source=media[1])
         if articles:
             formatted_news = await format_data(articles, 'url', is_news=True)
-            await send_to_telegram(media[0], formatted_news)
+            message_info = await send_to_telegram(media[0], formatted_news)
+            all_message_info.append(message_info)  # 添加到总消息信息列表
         await asyncio.sleep(2)
 
     for category in CATEGORIES:
@@ -173,8 +186,16 @@ async def main():
         articles = await fetch_news_data(category=category[1])
         if articles:
             formatted_news = await format_data(articles, 'url', is_news=True)
-            await send_to_telegram(category[0], formatted_news)
+            message_info = await send_to_telegram(category[0], formatted_news)
+            all_message_info.append(message_info)  # 添加到总消息信息列表
         await asyncio.sleep(2)
+
+    # 在所有榜单发送完成后，发送跳转消息
+    if all_message_info:
+        jump_message = "点击查看热搜榜单：\n" + "\n".join(
+            [f"<a href='https://t.me/c/{TELEGRAM_CHANNEL_ID[1:]}/{info['id']}'>{escape_html(info['name'])}</a>" for info in all_message_info]
+        )
+        await bot.send_message(chat_id=TELEGRAM_CHANNEL_ID, text=jump_message, parse_mode='HTML')
 
 if __name__ == "__main__":
     asyncio.run(main())
