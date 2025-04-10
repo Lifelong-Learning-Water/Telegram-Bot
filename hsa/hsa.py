@@ -156,7 +156,7 @@ async def send_to_telegram(platform, formatted_data):
 async def main():
     tz = pytz.timezone('Asia/Shanghai')
     current_time = datetime.now(tz).strftime("%Y-%m-%d %H:%M")
-    init_message = await bot.send_message(chat_id=TELEGRAM_CHANNEL_ID, text=f"北京时间: <b>{current_time}</b>", parse_mode='HTML')
+    init_message = await bot.send_message(chat_id=TELEGRAM_CHANNEL_ID, text=f"更新（北京）时间: <b>{current_time}</b>", parse_mode='HTML')
     await bot.pin_chat_message(chat_id=TELEGRAM_CHANNEL_ID, message_id=init_message.message_id)
     await asyncio.sleep(2)
 
@@ -192,11 +192,11 @@ async def main():
     """
 
     if all_message_info:
-        jump_message = "点击链接查看榜单：\n"
+        jump_message = "更新（北京）时间: <b>{current_time}</b>\n点击查看对应榜单：\n"
         links = []
 
         for info in all_message_info:
-            link = f"◤ <a href='https://t.me/{TELEGRAM_CHANNEL_ID[1:]}/{info['id']}'>{escape_html(info['name'])}</a>"
+            link = f"☞ <a href='https://t.me/{TELEGRAM_CHANNEL_ID[1:]}/{info['id']}'>{escape_html(info['name'])}</a>"
             links.append(link)
 
         jump_message += "\n\n".join(links)
