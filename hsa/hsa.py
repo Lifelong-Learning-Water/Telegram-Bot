@@ -91,7 +91,7 @@ async def format_data(data_list, url_key, is_news=False):
         hot_info = f"<i>{item.get('hot')}🔥</i>" if not is_news and item.get('hot') else ""
 
         if is_news:
-            desc = await translate_text(item.get('description', '')) if item.get('description', '') != None else ''
+            desc = await translate_text(item.get('description')) if item.get('description', '') != 'None' or None else ''
         elif item.get('desc'):
             desc = item.get('desc')
         else:
@@ -113,7 +113,6 @@ async def send_to_telegram(platform, formatted_data):
     message = f"<b>{escape_html(platform)}</b> 热搜榜单\n" + "\n\n".join(top_five)
     sent_message = await bot.send_message(chat_id=TELEGRAM_CHANNEL_ID, text=message, parse_mode='HTML')
 
-    # 记录发送的消息 ID 和对应的榜单名称
     message_info = {
         'id': sent_message.message_id,
         'name': platform
@@ -190,9 +189,8 @@ async def main():
             all_message_info.append(message_info)  # 添加到总消息信息列表
         await asyncio.sleep(2)
 
-    # 在所有榜单发送完成后，发送跳转消息
     if all_message_info:
-        jump_message = "点击查看热搜榜单：\n\n" + "\n\n".join(
+        jump_message = "点击链接查看榜单：\n" + "\n".join(
             [f"<a href='https://t.me/c/{TELEGRAM_CHANNEL_ID[1:]}/{info['id']}'>{escape_html(info['name'])}</a>" for info in all_message_info]
         )
         await bot.send_message(chat_id=TELEGRAM_CHANNEL_ID, text=jump_message, parse_mode='HTML')
