@@ -10,12 +10,12 @@ API_BASE_URL = "https://api.pearktrue.cn/api/dailyhot/"
 NEWS_API_URL = "https://newsapi.org/v2/top-headlines"
 NEWS_API_KEY = os.environ["NEWS_API_KEY"]
 PLATFROMS = [
-    ["百度", "url"], ["微博", "url"],
+    ["知乎", "url"], ["微博", "url"],
     ["百度贴吧", "url"], ["少数派", "url"],
     ["IT之家", "url"], ["腾讯新闻", "url"],
     ["今日头条", "url"], ["36氪", "url"],
     ["哔哩哔哩", "mobileUrl"], ["澎湃新闻", "url"],
-    ["稀土掘金", "mobileUrl"], ["知乎", "url"]
+    ["稀土掘金", "mobileUrl"], ["百度", "url"]
 ]
 
 FOREIGN_MEDIA = [
@@ -173,7 +173,16 @@ async def main():
         if data:
             formatted = await format_data(data, platform[1])
             message_info = await send_to_telegram(platform[0], formatted)
-            all_message_info.append(message_info)  # 添加到总消息信息列表
+            all_message_info.append(message_info)
+        await asyncio.sleep(2)
+
+    for category in CATEGORIES:
+        print(f"正在获取：{category[0]}")
+        articles = await fetch_news_data(category=category[1])
+        if articles:
+            formatted_news = await format_data(articles, 'url', is_news=True)
+            message_info = await send_to_telegram(category[0], formatted_news)
+            all_message_info.append(message_info)
         await asyncio.sleep(2)
 
     for media in FOREIGN_MEDIA:
@@ -182,7 +191,7 @@ async def main():
         if articles:
             formatted_news = await format_data(articles, 'url', is_news=True)
             message_info = await send_to_telegram(media[0], formatted_news)
-            all_message_info.append(message_info)  # 添加到总消息信息列表
+            all_message_info.append(message_info)
         await asyncio.sleep(2)
 
     if all_message_info:
