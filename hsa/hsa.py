@@ -67,6 +67,7 @@ async def fetch_news_data(source=None, category=None):
         params['category'] = category
     data = await fetch_data(NEWS_API_URL, params)
     if data and data.get("status") == "ok":
+        print(data)
         return data.get("articles", [])
     print(f"警告：{source or category} API返回错误：{data.get('message') if data else '未知错误'}")
     return []
