@@ -98,7 +98,7 @@ async def format_data(data_list, url_key, is_news=False):
             desc = ''
 
         if desc:
-            desc = "\n\n" + escape_html(desc) + "\n"
+            desc = "\n\n" + escape_html(desc) 
 
         formatted_string = f"{index}. <a href=\"{url}\">{title}</a>{hot_info}{desc}"
         formatted_data.append(formatted_string)
@@ -108,7 +108,7 @@ async def format_data(data_list, url_key, is_news=False):
 async def send_to_telegram(platform, formatted_data):
     """发送数据到 Telegram 频道"""
     top_five = formatted_data[:5]
-    message = f"<b>{escape_html(platform)}</b> 热搜榜单\n" + "\n".join(top_five)
+    message = f"<b>{escape_html(platform)}</b> 热搜榜单\n" + "\n\n".join(top_five)
     sent_message = await bot.send_message(chat_id=TELEGRAM_CHANNEL_ID, text=message, parse_mode='HTML')
 
     await asyncio.sleep(4)
