@@ -195,11 +195,11 @@ async def main():
         await asyncio.sleep(2)
 
     if all_message_info:
-        jump_message = f"更新（北京）时间: <b>{current_time}</b>\n点击查看对应榜单：\n"
+        jump_message = f"更新（北京）时间: <b>{current_time}</b>\n点击名称查看对应完整榜单：\n"
         links = []
 
         for info in all_message_info:
-            link = f"☞ <a href='https://t.me/{TELEGRAM_CHANNEL_ID[1:]}/{info['id']}'>{escape_html(info['name'])}</a>\n首条: {info['first_hot_search']}"
+            link = f"☞ <a href='https://t.me/{TELEGRAM_CHANNEL_ID[1:]}/{info['id']}'>{escape_html(info['name'])}</a>\n首条: {info['first_hot_search'][3:]}"
             links.append(link)
 
         jump_message += "\n\n".join(links)
