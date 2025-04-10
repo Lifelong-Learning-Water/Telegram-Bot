@@ -23,7 +23,7 @@ FOREIGN_MEDIA = [
 ]
 
 CATEGORIES = [
-    ["商业", "business"], ["科学", "science"], ["技术", "technology"], ["综合", "general"]
+    ["世界-商业", "business"], ["世界-科学", "science"], ["世界-技术", "technology"], ["世界-综合", "general"]
 ]
 
 TELEGRAM_BOT_TOKEN = os.environ["BOT_TOKEN"]
@@ -150,6 +150,14 @@ async def main():
     await bot.pin_chat_message(chat_id=TELEGRAM_CHANNEL_ID, message_id=init_message.message_id)
     await asyncio.sleep(2)
 
+    for platform in PLATFROMS:
+        print(f"正在获取：{platform[0]}")
+        data = await fetch_hot_data(platform[0])
+        if data:
+            formatted = await format_data(data, platform[1])
+            await send_to_telegram(platform[0], formatted)
+        await asyncio.sleep(2)
+
     for media in FOREIGN_MEDIA:
         print(f"正在获取：{media[0]}")
         articles = await fetch_news_data(source=media[1])
@@ -164,14 +172,6 @@ async def main():
         if articles:
             formatted_news = await format_data(articles, 'url', is_news=True)
             await send_to_telegram(category[0], formatted_news)
-        await asyncio.sleep(2)
-
-    for platform in PLATFROMS:
-        print(f"正在获取：{platform[0]}")
-        data = await fetch_hot_data(platform[0])
-        if data:
-            formatted = await format_data(data, platform[1])
-            await send_to_telegram(platform[0], formatted)
         await asyncio.sleep(2)
 
 if __name__ == "__main__":
