@@ -33,7 +33,8 @@ TELEGRAM_GROUP_ID = '-1002699038758'
 bot = Bot(token=TELEGRAM_BOT_TOKEN)
 
 def escape_html(text):
-    """转义 HTML 特殊字符"""
+    if text is None:
+        return ""
     return text.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;")
 
 async def fetch_data(url, params):
