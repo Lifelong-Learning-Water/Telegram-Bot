@@ -193,7 +193,7 @@ async def main():
     """
 
     if all_message_info:
-        jump_message = "更新（北京）时间: <b>{current_time}</b>\n点击查看对应榜单：\n"
+        jump_message = f"更新（北京）时间: <b>{current_time}</b>\n点击查看对应榜单：\n"
         links = []
 
         for info in all_message_info:
