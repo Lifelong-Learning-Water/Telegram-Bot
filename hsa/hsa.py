@@ -60,7 +60,7 @@ async def fetch_hot_data(platform):
 
 async def fetch_news_data(source=None, category=None):
     """获取指定来源或类别的新闻数据"""
-    params = {'apiKey': NEWS_API_KEY, 'pageSize': 20}
+    params = {'apiKey': NEWS_API_KEY, 'pageSize': 15}
     if source:
         params['sources'] = source
     if category:
