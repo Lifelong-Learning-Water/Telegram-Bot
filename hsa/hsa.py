@@ -85,13 +85,13 @@ async def format_data(data_list, url_key, is_news=False):
     formatted_data = []
     for index, item in enumerate(data_list, start=1):
         title = item.get('title', '无标题') if not is_news else await translate_text(item.get('title', '无标题'))
-        title = title if title is not None else '无标题'  # 确保 title 不是 None
-        title = escape_html(title)  # 现在可以安全地调用 escape_html
+        title = title if title is not None else '无标题'
+        title = escape_html(title)
         url = item.get(url_key, '#')
         hot_info = f"<i>{item.get('hot')}🔥</i>" if not is_news and item.get('hot') else ""
 
         if is_news:
-            desc = await translate_text(item.get('description', ''))
+            desc = await translate_text(item.get('description', '')) if item.get('description', '') != 'None' else ''
         elif item.get('desc'):
             desc = item.get('desc')
         else:
