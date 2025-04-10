@@ -90,8 +90,8 @@ async def format_data(data_list, url_key, is_news=False):
         url = item.get(url_key, '#')
         hot_info = f"<i>{item.get('hot')}🔥</i>" if not is_news and item.get('hot') else ""
 
-        if is_news:
-            desc = await translate_text(item.get('description')) if item.get('description', '') != 'None' or None else ''
+        if is_news and item.get('description', ''):
+            desc = await translate_text(item.get('description'))
         elif item.get('desc'):
             desc = item.get('desc')
         else:
