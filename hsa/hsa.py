@@ -176,21 +176,21 @@ async def main():
             all_message_info.append(message_info)
         await asyncio.sleep(2)
 
-    for category in CATEGORIES:
-        print(f"正在获取：{category[0]}")
-        articles = await fetch_news_data(category=category[1])
-        if articles:
-            formatted_news = await format_data(articles, 'url', is_news=True)
-            message_info = await send_to_telegram(category[0], formatted_news)
-            all_message_info.append(message_info)
-        await asyncio.sleep(2)
-
     for media in FOREIGN_MEDIA:
         print(f"正在获取：{media[0]}")
         articles = await fetch_news_data(source=media[1])
         if articles:
             formatted_news = await format_data(articles, 'url', is_news=True)
             message_info = await send_to_telegram(media[0], formatted_news)
+            all_message_info.append(message_info)
+        await asyncio.sleep(2)
+
+    for category in CATEGORIES:
+        print(f"正在获取：{category[0]}")
+        articles = await fetch_news_data(category=category[1])
+        if articles:
+            formatted_news = await format_data(articles, 'url', is_news=True)
+            message_info = await send_to_telegram(category[0], formatted_news)
             all_message_info.append(message_info)
         await asyncio.sleep(2)
 
