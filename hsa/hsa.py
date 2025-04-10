@@ -190,9 +190,14 @@ async def main():
         await asyncio.sleep(2)
 
     if all_message_info:
-        jump_message = "点击链接查看榜单：\n" + "\n".join(
-            [f"<a href='https://t.me/c/{TELEGRAM_CHANNEL_ID[1:]}/{info['id']}'>{escape_html(info['name'])}</a>" for info in all_message_info]
-        )
+        jump_message = "点击链接查看榜单：\n"
+        links = []
+
+        for info in all_message_info:
+            link = f"<a href='https://t.me/c/{TELEGRAM_CHANNEL_ID[1:]}/{info['id']}'>{escape_html(info['name'])}</a>"
+            links.append(link)
+
+        jump_message += "\n".join(links)
         await bot.send_message(chat_id=TELEGRAM_CHANNEL_ID, text=jump_message, parse_mode='HTML')
 
 if __name__ == "__main__":
