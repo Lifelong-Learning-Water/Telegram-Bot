@@ -196,10 +196,10 @@ async def main():
         links = []
 
         for info in all_message_info:
-            link = f"<a href='https://t.me/{TELEGRAM_CHANNEL_ID[1:]}/{info['id']}'>{escape_html(info['name'])}</a>"
+            link = f"◤ <a href='https://t.me/{TELEGRAM_CHANNEL_ID[1:]}/{info['id']}'>{escape_html(info['name'])}</a>"
             links.append(link)
 
-        jump_message += "\n".join(links)
+        jump_message += "\n\n".join(links)
         await bot.send_message(chat_id=TELEGRAM_CHANNEL_ID, text=jump_message, parse_mode='HTML')
 
 if __name__ == "__main__":
