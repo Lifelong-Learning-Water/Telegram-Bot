@@ -91,7 +91,7 @@ async def format_data(data_list, url_key, is_news=False):
         url = item.get(url_key, '#')
         hot_info = f"<i>{item.get('hot')}🔥</i>" if not is_news and item.get('hot') else ""
 
-        if item.get('description', ''):
+        if item.get('description'):
             desc = await translate_text(item.get('description'))
         elif item.get('desc'):
             desc = item.get('desc')
@@ -102,6 +102,8 @@ async def format_data(data_list, url_key, is_news=False):
             if len(desc) > 100:
                 desc = desc[:100] + '...'
             desc = "\n\n" + escape_html(desc) 
+        else:
+            desc = ""
 
         formatted_string = f"{index}. <a href=\"{url}\">{title}</a>{hot_info}{desc}"
         formatted_data.append(formatted_string)
