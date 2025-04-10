@@ -122,7 +122,7 @@ async def send_to_telegram(platform, formatted_data):
         'name': platform,
         'first_hot_search': first_hot_search  # 记录第一条热搜
     }
-"""
+    """
     await asyncio.sleep(4)
 
     # 获取群组中的最新消息
@@ -154,7 +154,7 @@ async def send_to_telegram(platform, formatted_data):
         comment_message = "\n\n".join(group)
         await bot.send_message(chat_id=TELEGRAM_GROUP_ID, text=comment_message, parse_mode='HTML', reply_to_message_id=forwarded_message_id)
         await asyncio.sleep(2)
-"""
+    """
     # 返回记录的消息信息
     return message_info
 
