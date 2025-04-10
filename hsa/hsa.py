@@ -60,7 +60,7 @@ async def fetch_hot_data(platform):
 
 async def fetch_news_data(source=None, category=None):
     """获取指定来源或类别的新闻数据"""
-    params = {'apiKey': NEWS_API_KEY, 'pageSize': 15}
+    params = {'apiKey': NEWS_API_KEY, 'pageSize': 20}
     if source:
         params['sources'] = source
     if category:
@@ -148,7 +148,7 @@ async def send_to_telegram(platform, formatted_data):
         return message_info  # 返回消息信息
 
     for i in range(5, len(formatted_data), 5):
-        group = formatted_data[i:i + 5]
+        group = formatted_data[i:i + 10]
         comment_message = "\n\n".join(group)
         await bot.send_message(chat_id=TELEGRAM_GROUP_ID, text=comment_message, parse_mode='HTML', reply_to_message_id=forwarded_message_id)
         await asyncio.sleep(2)
