@@ -147,7 +147,7 @@ async def send_to_telegram(platform, formatted_data):
         print("未找到转发的消息 ID")
         return message_info  # 返回消息信息
 
-    for i in range(5, len(formatted_data), 5):
+    for i in range(5, len(formatted_data), 10):
         group = formatted_data[i:i + 10]
         comment_message = "\n\n".join(group)
         await bot.send_message(chat_id=TELEGRAM_GROUP_ID, text=comment_message, parse_mode='HTML', reply_to_message_id=forwarded_message_id)
