@@ -111,12 +111,14 @@ async def format_data(data_list, url_key, is_news=False):
 async def send_to_telegram(platform, formatted_data):
     """发送数据到 Telegram 频道并记录消息 ID"""
     top_five = formatted_data[:5]
+    first_hot_search = formatted_data[0] if formatted_data else "无热搜"
     message = f"<b>{escape_html(platform)}</b> 热搜榜单\n" + "\n\n".join(top_five)
     sent_message = await bot.send_message(chat_id=TELEGRAM_CHANNEL_ID, text=message, parse_mode='HTML')
 
     message_info = {
         'id': sent_message.message_id,
-        'name': platform
+        'name': platform,
+        'first_hot_search': first_hot_search  # 记录第一条热搜
     }
 
     await asyncio.sleep(4)
@@ -181,27 +183,13 @@ async def main():
             all_message_info.append(message_info)  # 添加到总消息信息列表
         await asyncio.sleep(2)
 
-    """
-    for category in CATEGORIES:
-        print(f"正在获取：{category[0]}")
-        articles = await fetch_news_data(category=category[1])
-        if articles:
-            formatted_news = await format_data(articles, 'url', is_news=True)
-            message_info = await send_to_telegram(category[0], formatted_news)
-            all_message_info.append(message_info)  # 添加到总消息信息列表
-        await asyncio.sleep(2)
-    """
-
     if all_message_info:
         jump_message = f"更新（北京）时间: <b>{current_time}</b>\n点击查看对应榜单：\n"
         links = []
 
         for info in all_message_info:
-            link = f"☞ <a href='https://t.me/{TELEGRAM_CHANNEL_ID[1:]}/{info['id']}'>{escape_html(info['name'])}</a>"
+            link = f"☞ <a href='https://t.me/{TELEGRAM_CHANNEL_ID[1:]}/{info['id']}'>{escape_html(info['name'])}</a> - 第一条热搜: {info['first_hot_search']}"
             links.append(link)
 
         jump_message += "\n\n".join(links)
         await bot.send_message(chat_id=TELEGRAM_CHANNEL_ID, text=jump_message, parse_mode='HTML')
-
-if __name__ == "__main__":
-    asyncio.run(main())
