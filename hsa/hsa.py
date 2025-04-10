@@ -196,7 +196,7 @@ async def main():
         links = []
 
         for info in all_message_info:
-            link = f"<a href='https://t.me/@delta_water_hsa_bot/{info['id']}'>{escape_html(info['name'])}</a>"
+            link = f"<a href='https://t.me/{TELEGRAM_CHANNEL_ID[1:]}/{info['id']}'>{escape_html(info['name'])}</a>"
             links.append(link)
 
         jump_message += "\n".join(links)
