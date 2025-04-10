@@ -192,7 +192,7 @@ async def main():
 
     # 在所有榜单发送完成后，发送跳转消息
     if all_message_info:
-        jump_message = "点击查看热搜榜单：\n" + "\n".join(
+        jump_message = "点击查看热搜榜单：\n\n" + "\n\n".join(
             [f"<a href='https://t.me/c/{TELEGRAM_CHANNEL_ID[1:]}/{info['id']}'>{escape_html(info['name'])}</a>" for info in all_message_info]
         )
         await bot.send_message(chat_id=TELEGRAM_CHANNEL_ID, text=jump_message, parse_mode='HTML')
