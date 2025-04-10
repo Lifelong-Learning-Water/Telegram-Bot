@@ -141,7 +141,7 @@ async def send_to_telegram(platform, formatted_data):
 
     for i in range(5, len(formatted_data), 5):
         group = formatted_data[i:i + 5]
-        comment_message = "\n".join(group)
+        comment_message = "\n\n".join(group)
         await bot.send_message(chat_id=TELEGRAM_GROUP_ID, text=comment_message, parse_mode='HTML', reply_to_message_id=forwarded_message_id)
         await asyncio.sleep(2)
 
