@@ -84,7 +84,7 @@ async def translate_text(text):
 async def format_data(data_list, url_key, is_news=False):
     """格式化数据为可读文本，并添加序号""" 
     formatted_data = []
-    for index, item in enumerate(data_list, start=1):
+    for index, item in enumerate(data_list[:10], start=1):
         title = item.get('title', '无标题') if not is_news else await translate_text(item.get('title', '无标题'))
         title = title if title is not None else '无标题'
         title = escape_html(title)
@@ -99,7 +99,7 @@ async def format_data(data_list, url_key, is_news=False):
             desc = ''
 
         if desc:
-            if len(desc) > 100:
+            if len(desc) > 150:
                 desc = desc[:100] + '...'
             desc = "\n\n" + escape_html(desc) 
         else:
@@ -112,9 +112,9 @@ async def format_data(data_list, url_key, is_news=False):
 
 async def send_to_telegram(platform, formatted_data):
     """发送数据到 Telegram 频道并记录消息 ID"""
-    top_five = formatted_data[:5]
+    top = formatted_data[:10]
     first_hot_search = formatted_data[0] if formatted_data else "无热搜"
-    message = f"<b>{escape_html(platform)}</b> 热搜榜单\n" + "\n\n".join(top_five)
+    message = f"<b>{escape_html(platform)}</b> 热搜榜单\n" + "\n\n".join(top)
     sent_message = await bot.send_message(chat_id=TELEGRAM_CHANNEL_ID, text=message, parse_mode='HTML')
 
     message_info = {
@@ -122,7 +122,7 @@ async def send_to_telegram(platform, formatted_data):
         'name': platform,
         'first_hot_search': first_hot_search  # 记录第一条热搜
     }
-
+"""
     await asyncio.sleep(4)
 
     # 获取群组中的最新消息
@@ -154,7 +154,7 @@ async def send_to_telegram(platform, formatted_data):
         comment_message = "\n\n".join(group)
         await bot.send_message(chat_id=TELEGRAM_GROUP_ID, text=comment_message, parse_mode='HTML', reply_to_message_id=forwarded_message_id)
         await asyncio.sleep(2)
-
+"""
     # 返回记录的消息信息
     return message_info
 
