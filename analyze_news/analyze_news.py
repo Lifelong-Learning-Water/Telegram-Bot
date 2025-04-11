@@ -6,7 +6,7 @@ from telegram.ext import Updater, CommandHandler, CallbackContext
 # 你的 OpenAI API 密钥
 OPENAI_API_KEY = 'your_openai_api_key'
 # 你的 Telegram Bot API 密钥
-TELEGRAM_BOT_TOKEN = 'your_telegram_bot_token'
+TELEGRAM_BOT_TOKEN = os.environ['BOT_TOKEN']
 
 def analyze_news(url):
     api_url = f"https://api.pearktrue.cn/api/htmltext/?url={url}"
@@ -70,11 +70,11 @@ def analyze_news(url):
 def start(update: Update, context: CallbackContext) -> None:
     update.message.reply_text('欢迎使用新闻分析Bot！请发送 /analyze <新闻链接> 进行分析。')
 
-GROUP_ID = '@your_channel_username'
+GROUP_ID = '@stop_at_a_discussion'
 
 def analyze(update: Update, context: CallbackContext) -> None:
     # 检查消息是否来自指定频道
-    if update.message.chat.username != GROUP_ID.lstrip('@'):
+    if update.message.chat.username != GROUP_ID:
         return  # 如果不是指定频道的消息，则不处理
 
     if len(context.args) == 0:
