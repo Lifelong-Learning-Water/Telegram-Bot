@@ -7,7 +7,7 @@ from telegram.ext import Updater, CommandHandler, CallbackContext
 OPENAI_API_KEY = 'your_openai_api_key'
 # 你的 Telegram Bot API 密钥
 TELEGRAM_BOT_TOKEN = os.environ['BOT_TOKEN']
-base_url = 'http://61.189.189.2:11434/'
+base_url = 'http://61.189.189.2:11434/v1/'
 
 def analyze_news(url):
     api_url = f"https://api.pearktrue.cn/api/htmltext/?url={url}"
