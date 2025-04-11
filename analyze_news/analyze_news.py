@@ -7,6 +7,7 @@ from telegram.ext import Updater, CommandHandler, CallbackContext
 OPENAI_API_KEY = 'your_openai_api_key'
 # 你的 Telegram Bot API 密钥
 TELEGRAM_BOT_TOKEN = os.environ['BOT_TOKEN']
+base_url = 'http://61.189.189.2:11434/'
 
 def analyze_news(url):
     api_url = f"https://api.pearktrue.cn/api/htmltext/?url={url}"
@@ -17,7 +18,7 @@ def analyze_news(url):
         if data['code'] == 200:
             text_data = '\n'.join(data['data'])
             
-            openai = OpenAI(api_key=OPENAI_API_KEY)
+            openai = OpenAI(api_key=OPENAI_API_KEY, base_url=base_url)
             prompt = f"""作为一名经验丰富的新闻分析师，请对以下内容进行深入分析，并按照以下格式输出：
 
 ---
