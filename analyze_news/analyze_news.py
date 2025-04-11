@@ -85,7 +85,7 @@ def analyze(update: Update, context: CallbackContext) -> None:
     update.message.reply_text('正在分析，请稍候...')
     
     analysis_result = analyze_news(url)
-    update.message.reply_text(analysis_result)
+    context.bot.send_message(chat_id=GROUP_ID, text=analysis_result)
 
 def main() -> None:
     updater = Updater(TELEGRAM_BOT_TOKEN)
