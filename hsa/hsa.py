@@ -161,7 +161,7 @@ async def send_to_telegram(platform, formatted_data):
 async def main():
     tz = pytz.timezone('Asia/Shanghai')
     current_time = datetime.now(tz).strftime("%Y-%m-%d %H:%M")
-    init_message = await bot.send_message(chat_id=TELEGRAM_CHANNEL_ID, text=f"更新（北京）时间: <b>{current_time}</b>", parse_mode='HTML')
+    init_message = await bot.send_message(chat_id=TELEGRAM_CHANNEL_ID, text=f"北京时间: <b>{current_time}</b>", parse_mode='HTML')
     await bot.pin_chat_message(chat_id=TELEGRAM_CHANNEL_ID, message_id=init_message.message_id)
     await asyncio.sleep(2)
 
@@ -195,7 +195,7 @@ async def main():
         await asyncio.sleep(2)
 
     if all_message_info:
-        jump_message = f"更新（北京）时间: <b>{current_time}</b>\n点击名称查看对应完整榜单：\n"
+        jump_message = f"北京时间: <b>{current_time}</b>\n"
         links = []
 
         for info in all_message_info:
@@ -203,7 +203,7 @@ async def main():
             links.append(link)
 
         jump_message += "\n\n".join(links)
-        share_message = jump_message + "\n\n<b>加入我们了解最新热搜！</b>"
+        share_message = jump_message + "\n\n<b><i>加入我们了解最新热搜！</i></b>"
         await bot.send_message(chat_id=TELEGRAM_CHANNEL_ID, text=share_message, parse_mode='HTML')
 
 if __name__ == '__main__':
