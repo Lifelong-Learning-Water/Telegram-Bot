@@ -4,17 +4,11 @@ import aiohttp
 from datetime import datetime
 import pytz
 from telegram import Bot
-from googletrans import Translator
 
 # 配置信息
 API_BASE_URL = "https://api.pearktrue.cn/api/dailyhot/"
 NEWS_API_URL = "https://newsapi.org/v2/top-headlines"
 NEWS_API_KEY = os.environ["NEWS_API_KEY"]
-
-# 创建翻译器实例
-translator = Translator()
-
-# 媒体源
 PLATFROMS = [
     ["哔哩哔哩", "mobileUrl"], ["微博", "url"],
     ["百度贴吧", "url"], ["少数派", "url"],
@@ -80,14 +74,12 @@ async def fetch_news_data(source=None, category=None):
 
 async def translate_text(text):
     """调用翻译 API 翻译文本"""
-    if text is None:
-        return ""
-    try:
-        translated = translator.translate(text, dest='zh-cn')  # 将目标语言设置为中文
-        return translated.text
-    except Exception as e:
-        print(f"翻译错误：{text}，错误信息：{str(e)}")
-        return text  # 如果翻译失败，返回原文本
+    url = f"https://api.52vmy.cn/api/query/fanyi?msg={text}"
+    translated_data = await fetch_data(url, {})
+    if translated_data and 'target' in translated_data['data']:
+        return translated_data['data']['target']
+    print(f"翻译错误：{text}")
+    return text  # 如果翻译失败，返回原文本
 
 async def format_data(data_list, url_key, is_news=False):
     """格式化数据为可读文本，并添加序号""" 
@@ -216,6 +208,3 @@ async def main():
 
 if __name__ == '__main__':
     asyncio.run(main())
-
-
-将里面的翻译替换为google库
