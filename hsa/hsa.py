@@ -203,7 +203,7 @@ async def main():
             links.append(link)
 
         jump_message += "\n\n".join(links)
-        share_message += "\n\n<b>加入我们了解最新热搜！</b>"
+        share_message = jump_message + "\n\n<b>加入我们了解最新热搜！</b>"
         await bot.send_message(chat_id=TELEGRAM_CHANNEL_ID, text=share_message, parse_mode='HTML')
 
 if __name__ == '__main__':
