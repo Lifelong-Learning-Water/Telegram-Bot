@@ -195,7 +195,7 @@ async def main():
         await asyncio.sleep(2)
 
     if all_message_info:
-        jump_message = f"北京时间: <b>{current_time}</b>\n"
+        jump_message = f"北京时间: <b>{current_time}</b>\n\n"
         links = []
 
         for info in all_message_info:
