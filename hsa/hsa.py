@@ -3,8 +3,6 @@ import asyncio
 import aiohttp
 from datetime import datetime
 import pytz
-from concurrent.futures import ThreadPoolExecutor
-from googletrans import Translator
 from telegram import Bot
 
 # 配置信息
@@ -32,10 +30,7 @@ TELEGRAM_BOT_TOKEN = os.environ["BOT_TOKEN"]
 TELEGRAM_CHANNEL_ID = '@hot_search_aggregation'
 TELEGRAM_GROUP_ID = '-1002699038758'
 
-# 初始化组件
 bot = Bot(token=TELEGRAM_BOT_TOKEN)
-translator_executor = ThreadPoolExecutor(max_workers=10)
-translator = Translator()
 
 def escape_html(text):
     if text is None:
@@ -72,48 +67,43 @@ async def fetch_news_data(source=None, category=None):
         params['category'] = category
     data = await fetch_data(NEWS_API_URL, params)
     if data and data.get("status") == "ok":
+        print(data)
         return data.get("articles", [])
     print(f"警告：{source or category} API返回错误：{data.get('message') if data else '未知错误'}")
     return []
 
 async def translate_text(text):
-    """使用线程池执行Google翻译"""
-    if not text:
-        return text
-    
-    loop = asyncio.get_event_loop()
-    try:
-        # 在单独的线程中执行同步翻译操作
-        translated = await loop.run_in_executor(
-            translator_executor,
-            lambda: translator.translate(text, dest='zh-cn').text
-        )
-        return translated
-    except Exception as e:
-        print(f"翻译错误：{str(e)}，原文：{text}")
-        return text
+    """调用翻译 API 翻译文本"""
+    url = f"https://api.52vmy.cn/api/query/fanyi?msg={text}"
+    translated_data = await fetch_data(url, {})
+    if translated_data and 'target' in translated_data['data']:
+        return translated_data['data']['target']
+    print(f"翻译错误：{text}")
+    return text  # 如果翻译失败，返回原文本
 
 async def format_data(data_list, url_key, is_news=False):
     """格式化数据为可读文本，并添加序号""" 
     formatted_data = []
     for index, item in enumerate(data_list[:10], start=1):
-        # 翻译处理
-        title = item.get('title', '无标题')
-        if is_news and title != '无标题':
-            title = await translate_text(title)
-        
+        title = item.get('title', '无标题') if not is_news else await translate_text(item.get('title', '无标题'))
+        title = title if title is not None else '无标题'
         title = escape_html(title)
         url = item.get(url_key, '#')
         hot_info = f"<i>{item.get('hot')}🔥</i>" if not is_news and item.get('hot') else ""
 
-        # 描述处理
-        desc = item.get('description') or item.get('desc') or ''
-        if desc and is_news:
-            desc = await translate_text(desc)
-        
-        desc = escape_html(desc)
+        if item.get('description'):
+            desc = await translate_text(item.get('description'))
+        elif item.get('desc'):
+            desc = item.get('desc')
+        else:
+            desc = ''
+
         if desc:
-            desc = f"\n\n{desc[:150] + '...' if len(desc) > 150 else desc}"
+            if len(desc) > 150:
+                desc = desc[:100] + '...'
+            desc = "\n\n" + escape_html(desc) 
+        else:
+            desc = ""
 
         formatted_string = f"{index}. <a href=\"{url}\">{title}</a>{hot_info}{desc}"
         formatted_data.append(formatted_string)
@@ -130,8 +120,42 @@ async def send_to_telegram(platform, formatted_data):
     message_info = {
         'id': sent_message.message_id,
         'name': platform,
-        'first_hot_search': first_hot_search
+        'first_hot_search': first_hot_search  # 记录第一条热搜
     }
+    """
+    await asyncio.sleep(4)
+
+    # 获取群组中的最新消息
+    offset = 0
+    forwarded_message_id = None
+    sent_time = sent_message.date.timestamp()
+
+    while True:
+        updates = await bot.get_updates(offset=offset)
+        if not updates:
+            break
+
+        for update in updates:
+            if update.message and update.message.chat.id == int(TELEGRAM_GROUP_ID):
+                if update.message.date.timestamp() > sent_time and update.message.is_automatic_forward:
+                    forwarded_message_id = update.message.message_id
+                    break
+            offset = update.update_id + 1
+
+        if forwarded_message_id is not None:
+            break
+
+    if forwarded_message_id is None:
+        print("未找到转发的消息 ID")
+        return message_info  # 返回消息信息
+
+    for i in range(5, len(formatted_data), 10):
+        group = formatted_data[i:i + 10]
+        comment_message = "\n\n".join(group)
+        await bot.send_message(chat_id=TELEGRAM_GROUP_ID, text=comment_message, parse_mode='HTML', reply_to_message_id=forwarded_message_id)
+        await asyncio.sleep(2)
+    """
+    # 返回记录的消息信息
     return message_info
 
 async def main():
@@ -141,9 +165,17 @@ async def main():
     await bot.pin_chat_message(chat_id=TELEGRAM_CHANNEL_ID, message_id=init_message.message_id)
     await asyncio.sleep(2)
 
-    all_message_info = []
-
-    # 获取国际媒体新闻
+    all_message_info = []  # 用于记录所有热搜榜单的消息 ID 和名称
+    """
+    for category in CATEGORIES:
+        print(f"正在获取：{category[0]}")
+        articles = await fetch_news_data(category=category[1])
+        if articles:
+            formatted_news = await format_data(articles, 'url', is_news=True)
+            message_info = await send_to_telegram(category[0], formatted_news)
+            all_message_info.append(message_info)
+        await asyncio.sleep(2)
+    """
     for media in FOREIGN_MEDIA:
         print(f"正在获取：{media[0]}")
         articles = await fetch_news_data(source=media[1])
@@ -153,7 +185,6 @@ async def main():
             all_message_info.append(message_info)
         await asyncio.sleep(2)
 
-    # 获取国内平台热搜
     for platform in PLATFROMS:
         print(f"正在获取：{platform[0]}")
         data = await fetch_hot_data(platform[0])
@@ -163,7 +194,6 @@ async def main():
             all_message_info.append(message_info)
         await asyncio.sleep(2)
 
-    # 生成聚合消息
     if all_message_info:
         jump_message = f"北京时间: <b>{current_time}</b>\n\n"
         links = []
@@ -176,8 +206,8 @@ async def main():
         share_message = jump_message + "\n\n<b><i>加入我们了解最新热搜！</i></b>"
         await bot.send_message(chat_id=TELEGRAM_CHANNEL_ID, text=share_message, parse_mode='HTML')
 
-    # 关闭线程池
-    translator_executor.shutdown(wait=True)
-
 if __name__ == '__main__':
     asyncio.run(main())
+
+
+将里面的翻译替换为google库
