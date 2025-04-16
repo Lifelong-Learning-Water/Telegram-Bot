@@ -33,7 +33,7 @@ TELEGRAM_CHANNEL_ID = '@hot_search_aggregation'
 TELEGRAM_GROUP_ID = '-1002699038758'
 
 bot = Bot(token=TELEGRAM_BOT_TOKEN)
-_ = ts.preaccelerate_and_speedtest()
+# _ = ts.preaccelerate_and_speedtest()
 
 def escape_html(text):
     if text is None:
