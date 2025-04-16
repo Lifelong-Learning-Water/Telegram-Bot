@@ -206,7 +206,7 @@ async def main():
         links = []
 
         for info in all_message_info:
-            link = f"<b><a href='https://t.me/{TELEGRAM_CHANNEL_ID[1:]}/{info['id']}'>☞  {escape_html(info['name'])}榜单</a></b>\n\n首条: {info['first_hot_search'][3:]}"
+            link = f"<b><a href='https://t.me/{TELEGRAM_CHANNEL_ID[1:]}/{info['id']}'>☞  {escape_html(info['name'])} 榜单</a></b>\n\n首条: {info['first_hot_search'][3:]}"
             links.append(link)
 
         jump_message += "\n\n".join(links)
