@@ -121,7 +121,7 @@ async def send_to_telegram(platform, formatted_data):
     """发送数据到 Telegram 频道并记录消息 ID"""
     top = formatted_data[:10]
     first_hot_search = formatted_data[0] if formatted_data else "无热搜"
-    message = f"<b>{escape_html(platform)}</b> 热搜榜单\n" + "\n\n".join(top)
+    message = f"<b>{escape_html(platform)}</b> 热点榜单\n" + "\n\n".join(top)
     sent_message = await bot.send_message(chat_id=TELEGRAM_CHANNEL_ID, text=message, parse_mode='HTML')
 
     message_info = {
@@ -206,7 +206,7 @@ async def main():
         links = []
 
         for info in all_message_info:
-            link = f"<b><a href='https://t.me/{TELEGRAM_CHANNEL_ID[1:]}/{info['id']}'>{escape_html('☞  ' + info['name'])}</a></b>\n\n首条: {info['first_hot_search'][3:]}"
+            link = f"<b><a href='https://t.me/{TELEGRAM_CHANNEL_ID[1:]}/{info['id']}'>☞  {escape_html(info['name'])}榜单</a></b>\n\n首条: {info['first_hot_search'][3:]}"
             links.append(link)
 
         jump_message += "\n\n".join(links)
