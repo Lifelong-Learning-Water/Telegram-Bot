@@ -210,7 +210,7 @@ async def main():
             links.append(link)
 
         jump_message += "\n\n".join(links)
-        share_message = jump_message + "\n\n<i>自动更新，<a href='https://github.com/Lifelong-Learning-Water/Telegram-Bot'>开源项目</a>，欢迎加入！</i>"
+        share_message = jump_message + "\n\n<i>自动更新，<a href='https://github.com/Lifelong-Learning-Water/Telegram-Bot'>开源项目</a>，<b><a href='https://t.me/hot_search_aggregation'>欢迎加入</a>！</b></i>"
         await bot.send_message(chat_id=TELEGRAM_CHANNEL_ID, text=share_message, parse_mode='HTML')
 
 if __name__ == '__main__':
