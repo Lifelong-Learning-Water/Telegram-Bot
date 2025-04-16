@@ -4,7 +4,7 @@ import aiohttp
 from datetime import datetime
 import pytz
 from telegram import Bot
-from textblob import TextBlob
+import translators as ts  # 导入 translators 库
 
 # 配置信息
 API_BASE_URL = "https://api.pearktrue.cn/api/dailyhot/"
@@ -68,22 +68,20 @@ async def fetch_news_data(source=None, category=None):
         params['category'] = category
     data = await fetch_data(NEWS_API_URL, params)
     if data and data.get("status") == "ok":
-        print(data)
         return data.get("articles", [])
     print(f"警告：{source or category} API返回错误：{data.get('message') if data else '未知错误'}")
     return []
 
 async def translate_text(text):
-    """使用TextBlob翻译文本"""
+    """使用 translators 翻译文本"""
     if text is None:
         return ""
     try:
-        blob = TextBlob(text)
-        translated_text = str(blob.translate(to='zh'))  # 将文本翻译为中文
+        translated_text = ts.translate_text(text, to_language='zh')
         return translated_text
     except Exception as e:
         print(f"翻译错误：{text}，错误信息：{str(e)}")
-        return text  # 如果翻译失败，返回原文本
+        return text
 
 async def format_data(data_list, url_key, is_news=False):
     """格式化数据为可读文本，并添加序号""" 
@@ -126,40 +124,6 @@ async def send_to_telegram(platform, formatted_data):
         'name': platform,
         'first_hot_search': first_hot_search  # 记录第一条热搜
     }
-    """
-    await asyncio.sleep(4)
-
-    # 获取群组中的最新消息
-    offset = 0
-    forwarded_message_id = None
-    sent_time = sent_message.date.timestamp()
-
-    while True:
-        updates = await bot.get_updates(offset=offset)
-        if not updates:
-            break
-
-        for update in updates:
-            if update.message and update.message.chat.id == int(TELEGRAM_GROUP_ID):
-                if update.message.date.timestamp() > sent_time and update.message.is_automatic_forward:
-                    forwarded_message_id = update.message.message_id
-                    break
-            offset = update.update_id + 1
-
-        if forwarded_message_id is not None:
-            break
-
-    if forwarded_message_id is None:
-        print("未找到转发的消息 ID")
-        return message_info  # 返回消息信息
-
-    for i in range(5, len(formatted_data), 10):
-        group = formatted_data[i:i + 10]
-        comment_message = "\n\n".join(group)
-        await bot.send_message(chat_id=TELEGRAM_GROUP_ID, text=comment_message, parse_mode='HTML', reply_to_message_id=forwarded_message_id)
-        await asyncio.sleep(2)
-    """
-    # 返回记录的消息信息
     return message_info
 
 async def main():
@@ -170,16 +134,7 @@ async def main():
     await asyncio.sleep(2)
 
     all_message_info = []  # 用于记录所有热搜榜单的消息 ID 和名称
-    """
-    for category in CATEGORIES:
-        print(f"正在获取：{category[0]}")
-        articles = await fetch_news_data(category=category[1])
-        if articles:
-            formatted_news = await format_data(articles, 'url', is_news=True)
-            message_info = await send_to_telegram(category[0], formatted_news)
-            all_message_info.append(message_info)
-        await asyncio.sleep(2)
-    """
+
     for media in FOREIGN_MEDIA:
         print(f"正在获取：{media[0]}")
         articles = await fetch_news_data(source=media[1])
