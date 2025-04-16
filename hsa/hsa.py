@@ -77,7 +77,7 @@ async def translate_text(text):
     if text is None:
         return ""
     try:
-        translated_text = ts.translate_text(text, to_language='zh')
+        translated_text = ts.translate_text(text, from_language='en', to_language='zh')
         return translated_text
     except Exception as e:
         print(f"翻译错误：{text}，错误信息：{str(e)}")
