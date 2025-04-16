@@ -202,7 +202,7 @@ async def main():
         await asyncio.sleep(2)
 
     if all_message_info:
-        jump_message = f"北京时间: <b>{current_time}</b>\n\n"
+        jump_message = f"快速预览\n北京时间: <b>{current_time}</b>\n\n"
         links = []
 
         for info in all_message_info:
@@ -210,7 +210,7 @@ async def main():
             links.append(link)
 
         jump_message += "\n\n".join(links)
-        share_message = jump_message + "\n\n<i><a href='https://github.com/Lifelong-Learning-Water/Telegram-Bot'>开源项目</a>，欢迎共同维护！</i>"
+        share_message = jump_message + "\n\n<i>自动更新，<a href='https://github.com/Lifelong-Learning-Water/Telegram-Bot'>开源项目</a>，欢迎加入！</i>"
         await bot.send_message(chat_id=TELEGRAM_CHANNEL_ID, text=share_message, parse_mode='HTML')
 
 if __name__ == '__main__':
