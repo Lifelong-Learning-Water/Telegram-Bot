@@ -4,7 +4,6 @@ import aiohttp
 from datetime import datetime
 import pytz
 from telegram import Bot
-from textblob import TextBlob
 import translators as ts
 
 # 配置信息
