@@ -33,6 +33,7 @@ TELEGRAM_CHANNEL_ID = '@hot_search_aggregation'
 TELEGRAM_GROUP_ID = '-1002699038758'
 
 bot = Bot(token=TELEGRAM_BOT_TOKEN)
+_ = ts.preaccelerate_and_speedtest()
 
 def escape_html(text):
     if text is None:
@@ -79,7 +80,7 @@ async def translate_text(text):
     if text is None:
         return ""
     try:
-        translated_text = ts.translate_text(text, from_language='en', to_language='zh')
+        translated_text = ts.translate_text(text, translator='deepl', from_language='en', to_language='zh')
         return translated_text
     except Exception as e:
         print(f"翻译错误：{text}，错误信息：{str(e)}")
