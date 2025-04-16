@@ -21,7 +21,7 @@ PLATFROMS = [
 ]
 
 FOREIGN_MEDIA = [
-    ["彭博社", "bloomberg"], #["BBC", "bbc-news"]
+    ["彭博社", "bloomberg"], ["BBC", "bbc-news"]
 ]
 
 CATEGORIES = [
