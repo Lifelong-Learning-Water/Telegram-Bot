@@ -160,7 +160,7 @@ async def main():
     global session
     tz = pytz.timezone('Asia/Shanghai')
     current_time = datetime.now(tz).strftime("%Y-%m-%d %H:%M")
-    init_message = await bot.send_message(chat_id=TELEGRAM_CHANNEL_ID, text=f"北京时间: <b>{current_time}</b>", parse_mode='HTML')
+    init_message = await bot.send_message(chat_id=TELEGRAM_CHANNEL_ID, text=f"📅(UTC+8): <b>{current_time}</b>", parse_mode='HTML')
     await bot.pin_chat_message(chat_id=TELEGRAM_CHANNEL_ID, message_id=init_message.message_id)
     await asyncio.sleep(2)
 
@@ -200,7 +200,7 @@ async def main():
             all_message_info.append(message_info)
 
     if all_message_info:
-        jump_message = f"北京时间: <b>{current_time}</b>\n\n"
+        jump_message = f"📅(UTC+8): <b>{current_time}</b>\n\n"
         links = []
 
         for info in all_message_info:
@@ -208,7 +208,7 @@ async def main():
             links.append(link)
 
         jump_message += "\n\n".join(links)
-        share_message = jump_message + "\n\n<b><i>加入我们了解最新热搜！</i></b>"
+        share_message = jump_message + "\n\n<i><a href='https://github.com/Lifelong-Learning-Water/Telegram-Bot/'>开源项目</a>，欢迎共同维护！</i>"
         await bot.send_message(chat_id=TELEGRAM_CHANNEL_ID, text=share_message, parse_mode='HTML')
 
     await session.close()
