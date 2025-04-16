@@ -104,9 +104,9 @@ async def format_data(data_list, url_key, is_news=False):
             desc = ''
 
         if desc:
-            desc = re.sub(r'\s+', '', desc)
+            desc = desc.replace('\n', '')
             if len(desc) > 150:
-                desc = desc[:100] + '...'
+                desc = desc[:100] + '……'
             desc = "\n\n" + escape_html(desc) 
         else:
             desc = ""
