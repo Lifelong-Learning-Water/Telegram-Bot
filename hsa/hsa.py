@@ -5,6 +5,7 @@ from datetime import datetime
 import pytz
 from telegram import Bot
 import translators as ts
+import re
 
 # 配置信息
 API_BASE_URL = "https://api.pearktrue.cn/api/dailyhot/"
@@ -102,6 +103,7 @@ async def format_data(data_list, url_key, is_news=False):
             desc = ''
 
         if desc:
+            desc = re.sub(r'\s+', '', desc)
             if len(desc) > 150:
                 desc = desc[:100] + '...'
             desc = "\n\n" + escape_html(desc) 
@@ -202,11 +204,11 @@ async def main():
         links = []
 
         for info in all_message_info:
-            link = f"<a href='https://t.me/{TELEGRAM_CHANNEL_ID[1:]}/{info['id']}'>{escape_html('☞ ' + info['name'])}</a>\n\n首条: {info['first_hot_search'][3:]}"
+            link = f"<b><a href='https://t.me/{TELEGRAM_CHANNEL_ID[1:]}/{info['id']}'>{escape_html('☞  ' + info['name'])}</a></b>\n\n首条: {info['first_hot_search'][3:]}"
             links.append(link)
 
         jump_message += "\n\n".join(links)
-        share_message = jump_message + "\n\n<i><a href='https://github.com/Lifelong-Learning-Water/Telegram-Bot/'>开源项目</a>，欢迎共同维护！</i>"
+        share_message = jump_message + "\n\n<i><a href='https://github.com/Lifelong-Learning-Water/Telegram-Bot'>开源项目</a>，欢迎共同维护！</i>"
         await bot.send_message(chat_id=TELEGRAM_CHANNEL_ID, text=share_message, parse_mode='HTML')
 
 if __name__ == '__main__':
