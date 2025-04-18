@@ -221,7 +221,7 @@ async def send_to_category_channel(channel_id, source, category, items):
     await bot.send_message(chat_id=channel_id, text=message, parse_mode='HTML')
     await asyncio.sleep(2)
 
-async def fetch_and_process(media_list, fetch_function, is_news=False, is_category=False):
+async def fetch_and_process(media_list, is_news=False, is_category=False):
     """获取并处理新闻/热搜数据"""
     for item in media_list:
         print(f"正在获取：{item[0]}")
@@ -229,13 +229,13 @@ async def fetch_and_process(media_list, fetch_function, is_news=False, is_catego
         data = {}
         if is_category:
             category = item[1]
-            data = await fetch_function(category=category)
+            data = await fetch_news_data(category=category)
         elif is_news:
             source = item[1] if is_news else item[0]
-            data = await fetch_function(source=source)
+            data = await fetch_news_data(source=source)
         else:
             source = item[0]
-            data = await fetch_function(source)            
+            data = await fetch_hot_data(source)            
         if data
             format_key = "url" if is_news else item[1]
             formatted_news = await format_data(data, format_key, is_news=is_news)
@@ -252,9 +252,9 @@ async def main():
     await asyncio.sleep(2)
 
     first_message_info = [] # 记录每个榜单的第一条新闻/热搜
-    first_message_info.append(await fetch_and_process(FOREIGN_MEDIA, fetch_news_data, is_news=True))
-    first_message_info.append(await fetch_and_process(CATEGORIES, fetch_news_data, is_news=True))
-    first_message_info.append(await fetch_and_process(PLATFROMS, fetch_hot_data))
+    first_message_info.append(await fetch_and_process(FOREIGN_MEDIA, is_news=True))
+    first_message_info.append(await fetch_and_process(CATEGORIES, is_news=True, is_category=True))
+    first_message_info.append(await fetch_and_process(PLATFROMS))
 
     if first_message_info:
         jump_message = f"北京时间: <b>{current_time}</b>\n<b>-快-速-预-览-</b>\n\n"
