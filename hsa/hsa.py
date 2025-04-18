@@ -143,53 +143,39 @@ async def format_and_classify_data(data_list, url_key, is_news=False):
         classified_data[category].append(formatted_string)
     
     return classified_data
-async def send_to_telegram(platform, formatted_data):
-    """发送数据到 Telegram 频道并记录消息 ID"""
-    top = formatted_data[:10]
-    first_hot_search = formatted_data[0] if formatted_data else "无热搜"
-    message = f"<b>{escape_html(platform)}</b> 热点榜单\n" + "\n\n".join(top)
-    sent_message = await bot.send_message(chat_id=TELEGRAM_CHANNEL_ID, text=message, parse_mode='HTML')
 
-    message_info = {
-        'id': sent_message.message_id,
-        'name': platform,
-        'first_hot_search': first_hot_search  # 记录第一条热搜
+async def send_classified_data(platform, classified_data, is_news=False):
+    """按分类发送数据到不同频道"""
+    # 分类频道映射
+    CATEGORY_CHANNELS = {
+        "科技": "@tech_news_channel",
+        "财经": "@finance_news_channel",
+        "娱乐": "@entertainment_channel",
+        "社会": "@society_news_channel",
+        "国际": "@world_news_channel"
     }
-
-    await asyncio.sleep(4)
-
-    # 获取群组中的最新消息
-    offset = 0
-    forwarded_message_id = None
-    sent_time = sent_message.date.timestamp()
-
-    while True:
-        updates = await bot.get_updates(offset=offset)
-        if not updates:
-            break
-
-        for update in updates:
-            if update.message and update.message.chat.id == int(TELEGRAM_GROUP_ID):
-                if update.message.date.timestamp() > sent_time and update.message.is_automatic_forward:
-                    forwarded_message_id = update.message.message_id
-                    break
-            offset = update.update_id + 1
-
-        if forwarded_message_id is not None:
-            break
-
-    if forwarded_message_id is None:
-        print("未找到转发的消息 ID")
-        return message_info  # 返回消息信息
-
-    for i in range(10, len(formatted_data), 10):
-        group = formatted_data[i:i + 10]
-        comment_message = "\n\n".join(group)
-        await bot.send_message(chat_id=TELEGRAM_GROUP_ID, text=comment_message, parse_mode='HTML', reply_to_message_id=forwarded_message_id)
+    
+    # 1. 发送原始聚合数据到主频道
+    all_items = []
+    for category in classified_data:
+        all_items.extend(classified_data[category][:5])  # 每个分类取前5条
+    
+    if all_items:
+        message = f"<b>{escape_html(platform)} 热点精选</b>\n\n" + "\n\n".join(all_items[:15])
+        await bot.send_message(chat_id=TELEGRAM_CHANNEL_ID, text=message, parse_mode='HTML')
         await asyncio.sleep(2)
-
-    # 返回记录的消息信息
-    return message_info
+    
+    # 2. 发送完整分类数据到各专业频道
+    for category, items in classified_data.items():
+        if items and category in CATEGORY_CHANNELS:
+            channel_id = CATEGORY_CHANNELS[category]
+            header = "📰 " if is_news else "🔥 "
+            message = f"{header}<b>{escape_html(platform)} - {category}精选</b>\n\n" + "\n\n".join(items[:15])
+            try:
+                await bot.send_message(chat_id=channel_id, text=message, parse_mode='HTML')
+                await asyncio.sleep(1)
+            except Exception as e:
+                print(f"发送到{channel_id}失败: {str(e)}")
 
 async def main():
     tz = pytz.timezone('Asia/Shanghai')
