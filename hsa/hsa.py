@@ -6,11 +6,13 @@ import pytz
 from telegram import Bot
 import translators as ts
 import re
+from transformers import pipeline
 
 # 配置信息
 API_BASE_URL = "https://api.pearktrue.cn/api/dailyhot/"
 NEWS_API_URL = "https://newsapi.org/v2/top-headlines"
 NEWS_API_KEY = os.environ["NEWS_API_KEY"]
+
 PLATFROMS = [
     ["哔哩哔哩", "mobileUrl"], ["微博", "url"],
     ["百度贴吧", "url"], ["少数派", "url"],
@@ -34,6 +36,20 @@ TELEGRAM_GROUP_ID = '-1002699038758'
 
 bot = Bot(token=TELEGRAM_BOT_TOKEN)
 # _ = ts.preaccelerate_and_speedtest()
+
+classifier = pipeline("zero-shot-classification", 
+                     model="facebook/bart-large-mnli")
+
+async def classify_text(text, categories):
+    """使用零样本分类对文本进行分类"""
+    if not text or len(text) < 3:  # 过滤过短文本
+        return None
+    try:
+        result = classifier(text, categories, multi_label=False)
+        return result["labels"][0]  # 返回最可能的类别
+    except Exception as e:
+        print(f"分类错误: {str(e)}")
+        return None
 
 def escape_html(text):
     if text is None:
