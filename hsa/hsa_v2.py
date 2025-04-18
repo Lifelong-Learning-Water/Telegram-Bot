@@ -41,7 +41,8 @@ CATEGORY_CHANNELS = {
     "财经": "@finance_news_aggregation",
     "娱乐": "@entertainment_news_aggregation",
     "社会": "@society_news_aggregation",
-    "国际": "@world_news_aggregation"
+    "国际": "@world_news_aggregation",
+    # "其他": "@others_news_aggregation"
 }
 
 bot = Bot(token=TELEGRAM_BOT_TOKEN)
@@ -95,6 +96,7 @@ async def classify_text(text, categories=None):
     except Exception as e:
         print(f"分类错误: {str(e)}")
         return ["其他"]
+
 def escape_html(text):
     if text is None:
         return ""
