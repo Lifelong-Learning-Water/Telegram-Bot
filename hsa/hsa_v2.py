@@ -36,12 +36,12 @@ CATEGORY_CHANNELS = {
     "国际": "@world_news_aggregation",
     "社会": "@society_news_aggregation",
     "军事": "@military_news_aggregation",
+    "体育": "@sports_news_aggregation",
+    "娱乐": "@entertainment_news_aggregation",
     "其他": "@general_news_aggregation",
 }
 
 """ 因tg免费用户公开频道上限，暂时不使用的分类：
-    "体育": "@sports_news_aggregation",
-    "娱乐": "@entertainment_news_aggregation",
     "健康": "@health_news_aggregation",
     "教育": "@education_news_aggregation",
 """
@@ -277,7 +277,17 @@ async def main():
             links.append(link)
 
         jump_message += "\n\n".join(links)
-        share_message = jump_message + "\n\n<i>自动更新，<a href='https://github.com/Lifelong-Learning-Water/Telegram-Bot'>开源项目</a>，<b><a href='https://t.me/hot_search_aggregation'>热点聚合</a>！</b></i>"
+        
+        # 添加相关频道链接
+        related_channels = """
+<b>分类聚合频道：</b>
+<a href="https://t.me/tech_news_aggregation">科技聚合</a> <a href="https://t.me/finance_news_aggregation">财经聚合</a>
+<a href="https://t.me/world_news_aggregation">国际聚合</a> <a href="https://t.me/society_news_aggregation">社会聚合</a>
+<a href="https://t.me/military_news_aggregation">军事聚合</a> <a href="https://t.me/sports_news_aggregation">体育聚合</a>
+<a href="https://t.me/entertainment_news_aggregation">娱乐聚合</a> <a href="https://t.me/general_news_aggregation">其他聚合</a>
+"""
+        
+        share_message = jump_message + "\n\n" + related_channels + "\n\n<i>自动更新，<a href='https://github.com/Lifelong-Learning-Water/Telegram-Bot'>开源项目</a>，<b><a href='https://t.me/hot_search_aggregation'>热点聚合</a>！</b></i>"
         await bot.send_message(chat_id=TELEGRAM_CHANNEL_ID, text=share_message, parse_mode='HTML')
 
 if __name__ == '__main__':
