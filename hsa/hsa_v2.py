@@ -215,7 +215,7 @@ async def process_articles(articles, source_name):
     
     # 分频道发送
     for category, items in categorized.items():
-        channel_id = CATEGORY_CHANNELS.get(category, "@bot_test_dw")
+        channel_id = CATEGORY_CHANNELS.get(category, "@general_news_aggregation")
         await send_to_category_channel(channel_id, source_name, category, items)
 
 async def send_to_category_channel(channel_id, source, category, items):
