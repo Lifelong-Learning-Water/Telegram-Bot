@@ -229,7 +229,7 @@ async def send_to_category_channel(channel_id, source, category, items):
 
 async def fetch_and_process(media_list, is_news=False, is_category=False):
     """获取并处理新闻/热搜数据"""
-    
+    first_message_info = []
     async def get_data(item):
         if is_category:
             category = item[1]
@@ -251,9 +251,10 @@ async def fetch_and_process(media_list, is_news=False, is_category=False):
             message_info = await send_to_telegram(item[0], formatted_news)
             await process_articles(formatted_news, item[0])
             await asyncio.sleep(2)
-            return message_info
+            first_message_info.append(message_info)
         else:
             print(f"未能获取到数据：{item[0]}")
+    return first_message_info
 
 async def main():
     tz = pytz.timezone('Asia/Shanghai')
@@ -263,9 +264,9 @@ async def main():
     await asyncio.sleep(2)
 
     first_message_info = [] # 记录每个榜单的第一条新闻/热搜
-    first_message_info.append(await fetch_and_process(FOREIGN_MEDIA, is_news=True))
-    first_message_info.append(await fetch_and_process(CATEGORIES, is_news=True, is_category=True))
-    first_message_info.append(await fetch_and_process(PLATFROMS))
+    first_message_info += await fetch_and_process(FOREIGN_MEDIA, is_news=True)
+    first_message_info += await fetch_and_process(CATEGORIES, is_news=True, is_category=True)
+    first_message_info += await fetch_and_process(PLATFROMS)
 
     if first_message_info:
         jump_message = f"北京时间: <b>{current_time}</b>\n<b>-快-速-预-览-</b>\n\n"
