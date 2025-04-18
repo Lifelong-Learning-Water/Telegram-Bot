@@ -55,8 +55,7 @@ CATEGORY_CHANNELS = {
 async def classify_with_ollama(text):
     prompt = f"""请对以下新闻内容进行分类，仅返回分类结果：
     可选分类：科技、财经、国际、体育、娱乐、健康、教育、军事、其他
-    内容：{text[:1000]}  # 控制输入长度
-    
+    内容：{text[:1000]}
     返回格式：{{"category": "分类名称"}}"""
     
     payload = {
