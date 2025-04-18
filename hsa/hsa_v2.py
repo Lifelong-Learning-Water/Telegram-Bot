@@ -7,8 +7,6 @@ from telegram import Bot
 import translators as ts
 import re
 from transformers import pipeline
-from transformers import pipeline
-import torch
 
 # 配置信息
 API_BASE_URL = "https://api.pearktrue.cn/api/dailyhot/"
@@ -41,61 +39,25 @@ CATEGORY_CHANNELS = {
     "财经": "@finance_news_aggregation",
     "娱乐": "@entertainment_news_aggregation",
     "社会": "@society_news_aggregation",
-    "国际": "@world_news_aggregation",
-    # "其他": "@others_news_aggregation"
+    "国际": "@world_news_aggregation"
 }
 
 bot = Bot(token=TELEGRAM_BOT_TOKEN)
 # _ = ts.preaccelerate_and_speedtest()
 
-# 使用更适合中文的多语言模型
-classifier = pipeline(
-    "zero-shot-classification",
-    model="MoritzLaurer/mDeBERTa-v3-base-mnli-xnli",
-    device="cuda" if torch.cuda.is_available() else "cpu"
-)
+classifier = pipeline("zero-shot-classification", 
+                     model="facebook/bart-large-mnli")
 
-# 定义更细化的分类体系
-CATEGORY_HIERARCHY = {
-    "科技": ["人工智能", "互联网", "硬件", "软件", "区块链", "5G", "元宇宙"],
-    "财经": ["股市", "宏观经济", "公司动态", "投资理财", "金融科技", "消费"],
-    "娱乐": ["影视", "音乐", "游戏", "明星", "综艺", "动漫"],
-    "社会": ["民生", "法治", "教育", "健康", "环境", "就业"],
-    "国际": ["政治", "经济", "军事", "外交", "国际组织"]
-}
-
-# 生成平铺的分类标签
-def generate_category_labels():
-    labels = []
-    for parent, children in CATEGORY_HIERARCHY.items():
-        labels.extend([f"{parent}-{child}" for child in children])
-    return labels
-
-CATEGORY_LABELS = generate_category_labels()
-
-# 改进的分类函数
-async def classify_text(text, categories=None):
+async def classify_text(text, categories):
     """使用零样本分类对文本进行分类"""
-    if not text or len(text) < 10:  # 过滤过短文本
+    if not text or len(text) < 3:  # 过滤过短文本
         return None
-    
-    # 如果没有指定分类，使用默认分类体系
-    if categories is None:
-        categories = CATEGORY_LABELS
-    
     try:
-        result = classifier(text, categories, multi_label=True)
-        # 取置信度最高的前3个标签
-        top_labels = result["labels"][:3]
-        top_scores = result["scores"][:3]
-        
-        # 过滤低置信度的标签(阈值0.5)
-        filtered = [label for label, score in zip(top_labels, top_scores) if score > 0.5]
-        
-        return filtered if filtered else ["其他"]
+        result = classifier(text, categories, multi_label=False)
+        return result["labels"][0]  # 返回最可能的类别
     except Exception as e:
         print(f"分类错误: {str(e)}")
-        return ["其他"]
+        return None
 
 def escape_html(text):
     if text is None:
@@ -153,7 +115,7 @@ async def format_and_classify_data(data_list, url_key, is_news=False):
     """格式化数据并进行分类"""
     categories = ["科技", "财经", "娱乐", "社会", "国际"]  # 定义分类类别
     classified_data = {category: [] for category in categories}
-    
+
     for index, item in enumerate(data_list[:30], start=1):
         # 原始格式化逻辑
         title = item.get('title', '无标题') if not is_news else await translate_text(item.get('title', '无标题'))
@@ -178,16 +140,16 @@ async def format_and_classify_data(data_list, url_key, is_news=False):
             desc = ""
 
         formatted_string = f"{index}. <a href=\"{url}\">{title}</a>{hot_info}{desc}"
-        
+
         # 分类逻辑
         text_to_classify = f"{title} {desc}"
         category = await classify_text(text_to_classify, categories)
-        
+
         if not category:  # 分类失败默认类别
             category = "社会" if not is_news else "国际"
-            
+
         classified_data[category].append(formatted_string)
-    
+
     return classified_data
 
 async def send_classified_data(platform, classified_data, is_news=False):
@@ -196,12 +158,12 @@ async def send_classified_data(platform, classified_data, is_news=False):
     all_items = []
     for category in classified_data:
         all_items.extend(classified_data[category][:5])  # 每个分类取前5条
-    
+
     if all_items:
         message = f"<b>{escape_html(platform)} 热点精选</b>\n\n" + "\n\n".join(all_items[:15])
         await bot.send_message(chat_id=TELEGRAM_CHANNEL_ID, text=message, parse_mode='HTML')
         await asyncio.sleep(2)
-    
+
     # 2. 发送完整分类数据到各专业频道
     for category, items in classified_data.items():
         if items and category in CATEGORY_CHANNELS:
