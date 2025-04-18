@@ -184,46 +184,23 @@ async def main():
     await bot.pin_chat_message(chat_id=TELEGRAM_CHANNEL_ID, message_id=init_message.message_id)
     await asyncio.sleep(2)
 
-    all_message_info = []  # 用于记录所有热搜榜单的消息 ID 和名称
-
-    for media in FOREIGN_MEDIA:
-        print(f"正在获取：{media[0]}")
-        articles = await fetch_news_data(source=media[1])
-        if articles:
-            formatted_news = await format_data(articles, 'url', is_news=True)
-            message_info = await send_to_telegram(media[0], formatted_news)
-            all_message_info.append(message_info)
-        await asyncio.sleep(2)
-
-    for category in CATEGORIES:
-        print(f"正在获取：{category[0]}")
-        articles = await fetch_news_data(category=category[1])
-        if articles:
-            formatted_news = await format_data(articles, 'url', is_news=True)
-            message_info = await send_to_telegram(category[0], formatted_news)
-            all_message_info.append(message_info)
-        await asyncio.sleep(2)
+    all_message_info = []
 
     for platform in PLATFROMS:
         print(f"正在获取：{platform[0]}")
         data = await fetch_hot_data(platform[0])
         if data:
-            formatted = await format_data(data, platform[1])
-            message_info = await send_to_telegram(platform[0], formatted)
-            all_message_info.append(message_info)
+            classified = await format_and_classify_data(data, platform[1])
+            await send_classified_data(platform[0], classified)
         await asyncio.sleep(2)
 
-    if all_message_info:
-        jump_message = f"北京时间: <b>{current_time}</b>\n<b>-快-速-预-览-</b>\n\n"
-        links = []
-
-        for info in all_message_info:
-            link = f"<b><a href='https://t.me/{TELEGRAM_CHANNEL_ID[1:]}/{info['id']}'>☞  {escape_html(info['name'])} 榜单</a></b>\n\n首条: {info['first_hot_search'][3:]}"
-            links.append(link)
-
-        jump_message += "\n\n".join(links)
-        share_message = jump_message + "\n\n<i>自动更新，<a href='https://github.com/Lifelong-Learning-Water/Telegram-Bot'>开源项目</a>，<b><a href='https://t.me/hot_search_aggregation'>热点聚合</a>！</b></i>"
-        await bot.send_message(chat_id=TELEGRAM_CHANNEL_ID, text=share_message, parse_mode='HTML')
+    for media in FOREIGN_MEDIA:
+        print(f"正在获取：{media[0]}")
+        articles = await fetch_news_data(source=media[1])
+        if articles:
+            classified = await format_and_classify_data(articles, 'url', is_news=True)
+            await send_classified_data(media[0], classified, is_news=True)
+        await asyncio.sleep(2)
 
 if __name__ == '__main__':
     asyncio.run(main())
