@@ -204,13 +204,8 @@ async def send_to_telegram(platform, formatted_data):
 async def process_articles(articles, source_name):
     categorized = defaultdict(list)
     for article in articles:
-        # 组合分类依据
-        classification_text = f"{article.get('title','')} {article.get('description','')}"
-        category = await classify_with_ollama(classification_text)
-        
-        # 格式化条目
-        formatted = await format_entry(article)
-        categorized[category].append(formatted)
+        category = await classify_with_ollama(article)
+        categorized[category].append(article)
     
     # 分频道发送
     for category, items in categorized.items():
