@@ -238,6 +238,7 @@ async def main():
         if articles:
             formatted_news = await format_data(articles, 'url', is_news=True)
             message_info = await send_to_telegram(media[0], formatted_news)
+            await process_articles(formatted_news, media[0])
             all_message_info.append(message_info)
         await asyncio.sleep(2)
 
@@ -247,6 +248,7 @@ async def main():
         if articles:
             formatted_news = await format_data(articles, 'url', is_news=True)
             message_info = await send_to_telegram(category[0], formatted_news)
+            await process_articles(formatted_news, category[0])
             all_message_info.append(message_info)
         await asyncio.sleep(2)
 
