@@ -23,11 +23,11 @@ PLATFROMS = [
 ]
 
 FOREIGN_MEDIA = [
-    ["彭博社", "bloomberg"], ["BBC", "bbc-news"]
+    ["彭博社", "bloomberg"], # ["BBC", "bbc-news"]
 ]
 
 CATEGORIES = [
-    ["世界-商业", "business"], ["世界-科学", "science"], ["世界-技术", "technology"], ["世界-综合", "general"]
+    # ["世界-商业", "business"], ["世界-科学", "science"], ["世界-技术", "technology"], ["世界-综合", "general"]
 ]
 
 TELEGRAM_BOT_TOKEN = os.environ["BOT_TOKEN"]
