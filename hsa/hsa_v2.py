@@ -223,27 +223,31 @@ async def send_to_category_channel(channel_id, source, category, items):
 
 async def fetch_and_process(media_list, is_news=False, is_category=False):
     """获取并处理新闻/热搜数据"""
-    for item in media_list:
-        print(f"正在获取：{item[0]}")
-        source = ""
-        data = {}
+    
+    async def get_data(item):
         if is_category:
             category = item[1]
-            data = await fetch_news_data(category=category)
+            return await fetch_news_data(category=category)
         elif is_news:
-            source = item[1] if is_news else item[0]
-            data = await fetch_news_data(source=source)
+            source = item[1]
+            return await fetch_news_data(source=source)
         else:
             source = item[0]
-            data = await fetch_hot_data(source)            
-        if data
+            return await fetch_hot_data(source)
+
+    for item in media_list:
+        print(f"正在获取：{item[0]}")
+        data = await get_data(item)
+
+        if data:  # 确保数据不为空
             format_key = "url" if is_news else item[1]
             formatted_news = await format_data(data, format_key, is_news=is_news)
             message_info = await send_to_telegram(item[0], formatted_news)
             await process_articles(formatted_news, item[0])
             await asyncio.sleep(2)
             return message_info
-
+        else:
+            print(f"未能获取到数据：{item[0]}")
 async def main():
     tz = pytz.timezone('Asia/Shanghai')
     current_time = datetime.now(tz).strftime("%Y-%m-%d %H:%M")
