@@ -91,6 +91,7 @@ async def classify_text(text, categories):
             multi_label=False,
             hypothesis_template="这个文本主要关于{}"  # 中文优化模板
         )
+        print(result)
         
         # 提取最可能的类别
         best_label = result["labels"][0].split(":")[0]
