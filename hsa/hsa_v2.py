@@ -7,6 +7,8 @@ from telegram import Bot
 import translators as ts
 import re
 from transformers import pipeline
+from transformers import pipeline
+import torch
 
 # 配置信息
 API_BASE_URL = "https://api.pearktrue.cn/api/dailyhot/"
@@ -45,8 +47,24 @@ CATEGORY_CHANNELS = {
 bot = Bot(token=TELEGRAM_BOT_TOKEN)
 # _ = ts.preaccelerate_and_speedtest()
 
-classifier = pipeline("zero-shot-classification", 
-                     model="facebook/bart-large-mnli")
+# 使用更适合中文的多语言模型
+classifier = pipeline(
+    "zero-shot-classification",
+    model="MoritzLaurer/mDeBERTa-v3-base-mnli-xnli",
+    device="cuda" if torch.cuda.is_available() else "cpu"
+)
+
+# 定义更细化的分类体系
+CATEGORY_HIERARCHY = {
+    "科技": ["人工智能", "互联网", "硬件", "软件", "区块链", "5G", "元宇宙"],
+    "财经": ["股市", "宏观经济", "公司动态", "投资理财", "金融科技", "消费"],
+    "娱乐": ["影视", "音乐", "游戏", "明星", "综艺", "动漫"],
+    "社会": ["民生", "法治", "教育", "健康", "环境", "就业"],
+    "国际": ["政治", "经济", "军事", "外交", "国际组织"],
+    "体育": ["足球", "篮球", "综合", "电竞", "冬奥"],
+    "汽车": ["新能源", "传统车企", "智能驾驶", "车展", "政策"],
+    "房产": ["政策", "市场", "家居", "装修", "物业"]
+}
 
 async def classify_text(text, categories):
     """使用零样本分类对文本进行分类"""
