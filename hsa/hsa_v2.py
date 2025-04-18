@@ -36,7 +36,7 @@ bot = Bot(token=TELEGRAM_BOT_TOKEN)
 # _ = ts.preaccelerate_and_speedtest()
 
 # 新增配置项
-OLLAMA_API_URL = "http://localhost:11434/api/generate"  # Ollama服务地址
+OLLAMA_API_URL = "http://223.113.190.117:11434/api/generate"  # Ollama服务地址
 CATEGORY_CHANNELS = {
     "科技": "@tech_news_aggregation",
     "财经": "@finance_news_aggregation",
@@ -53,7 +53,7 @@ async def classify_with_ollama(text):
     返回格式：{{"category": "分类名称"}}"""
     
     payload = {
-        "model": "llama3",  # 根据实际模型调整
+        "model": "qwen2.5:14b",  # 根据实际模型调整
         "prompt": prompt,
         "format": "json",
         "stream": False
