@@ -41,7 +41,7 @@ OLLAMA_API_URL = "http://223.113.190.117:11434/api/generate"  # Ollama服务地�
 CATEGORY_CHANNELS = {
     "科技": "@tech_news_aggregation",
     "财经": "@finance_news_aggregation",
-    "国际": "@world_news_aggregation",
+    "政治": "@politics_news_aggregation",
     # "体育": "@sports_news_aggregation",
     # "娱乐": "@entertainment_news_aggregation",
     # "健康": "@health_news_aggregation",
@@ -50,7 +50,7 @@ CATEGORY_CHANNELS = {
     "其他": "@general_news_aggregation",
 }
 
-# 可选分类：科技、财经、国际、体育、娱乐、健康、教育、军事、其他
+# 可选分类：科技、财经、政治、体育、娱乐、健康、教育、军事、其他
 
 async def classify_with_ollama(text):
     prompt = f"""请对以下新闻内容进行分类，仅返回分类结果：
