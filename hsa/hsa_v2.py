@@ -6,14 +6,11 @@ import pytz
 from telegram import Bot
 import translators as ts
 import re
-from transformers import pipeline
-import torch
 
 # 配置信息
 API_BASE_URL = "https://api.pearktrue.cn/api/dailyhot/"
 NEWS_API_URL = "https://newsapi.org/v2/top-headlines"
 NEWS_API_KEY = os.environ["NEWS_API_KEY"]
-
 PLATFROMS = [
     ["哔哩哔哩", "mobileUrl"], ["微博", "url"],
     ["百度贴吧", "url"], ["少数派", "url"],
@@ -24,97 +21,19 @@ PLATFROMS = [
 ]
 
 FOREIGN_MEDIA = [
-    ["彭博社", "bloomberg"], # ["BBC", "bbc-news"]
+    ["彭博社", "bloomberg"], ["BBC", "bbc-news"]
 ]
 
 CATEGORIES = [
-    # ["世界-商业", "business"], ["世界-科学", "science"], ["世界-技术", "technology"], ["世界-综合", "general"]
+    ["世界-商业", "business"], ["世界-科学", "science"], ["世界-技术", "technology"], ["世界-综合", "general"]
 ]
 
 TELEGRAM_BOT_TOKEN = os.environ["BOT_TOKEN"]
-TELEGRAM_CHANNEL_ID = '@tech_news_aggregation'
-
-# 分类频道映射
-CATEGORY_CHANNELS = {
-    "科技": "@tech_news_aggregation",
-    "财经": "@finance_news_aggregation",
-    "娱乐": "@entertainment_news_aggregation",
-    "社会": "@society_news_aggregation",
-    "国际": "@world_news_aggregation"
-}
-
-categories = ["科技", "财经", "娱乐", "社会", "国际", "其他"]  # 定义分类类别
+TELEGRAM_CHANNEL_ID = '@hot_spot_aggregation' # -1002536090782
+TELEGRAM_GROUP_ID = '-1002699038758'
 
 bot = Bot(token=TELEGRAM_BOT_TOKEN)
 # _ = ts.preaccelerate_and_speedtest()
-
-# 专门为中文优化的零样本模型
-classifier = pipeline("zero-shot-classification",
-                     model="MoritzLaurer/DeBERTa-v3-large-mnli-fever-anli-ling-wanli",
-                     device="cuda" if torch.cuda.is_available() else "cpu")
-# 更细化的中文分类类别
-CATEGORIES = [
-    "科技", "财经", "娱乐", "社会", "国际", 
-    "体育", "健康", "教育", "军事", "汽车"
-]
-
-# 添加类别描述提高准确度
-CATEGORY_DESCRIPTIONS = {
-    "科技": "包括互联网、人工智能、电子产品、软件开发等技术相关内容",
-    "财经": "涉及股票、金融、投资、经济政策、市场趋势等内容",
-    "娱乐": "涵盖明星、电影、电视剧、音乐、综艺节目等娱乐产业内容",
-    "社会": "关于民生、法律、公共事件、社会现象等社会生活内容",
-    "国际": "国际关系、外交政策、全球事件等跨国内容",
-    "体育": "体育赛事、运动员、体育产业相关内容",
-    "健康": "医疗、养生、疾病预防、健康生活方式等内容",
-    "教育": "学校教育、教育改革、考试政策、学术研究等内容",
-    "军事": "国防、武器装备、军事行动、军事科技等内容",
-    "汽车": "汽车行业、新车发布、汽车技术、车展等内容"
-}
-
-async def classify_text(text, categories):
-    """优化后的中文文本分类函数"""
-    if not text or len(text) < 3:
-        return None
-    
-    # 预处理文本
-    processed_text = preprocess_text(text)
-    
-    # 准备带有描述的标签
-    candidate_labels = [f"{cat}: {CATEGORY_DESCRIPTIONS.get(cat, '')}" for cat in categories]
-    
-    try:
-        result = classifier(
-            processed_text, 
-            candidate_labels, 
-            multi_label=False,
-            hypothesis_template="这个文本主要关于{}"  # 中文优化模板
-        )
-        print(result)
-        
-        # 提取最可能的类别
-        best_label = result["labels"][0].split(":")[0]
-        confidence = result["scores"][0]
-        
-        # 只返回置信度高于阈值的分类
-        return best_label if confidence > 0.6 else "其他"
-    except Exception as e:
-        print(f"分类错误: {str(e)}")
-        return None
-
-def preprocess_text(text):
-    """预处理文本以提高分类准确度"""
-    if not text:
-        return ""
-    
-    # 移除URL、特殊字符和多余空格
-    text = re.sub(r'http\S+|www\S+|https\S+', '', text, flags=re.MULTILINE)
-    text = re.sub(r'\@\w+|\#', '', text)
-    text = re.sub(r'[^\w\s\u4e00-\u9fff]', '', text)  # 保留中文和基本字符
-    text = re.sub(r'\s+', ' ', text).strip()
-    
-    # 截断过长的文本(模型有token限制)
-    return text[:500]
 
 def escape_html(text):
     if text is None:
@@ -168,12 +87,10 @@ async def translate_text(text):
         print(f"翻译错误：{text}，错误信息：{str(e)}")
         return text
 
-async def format_and_classify_data(data_list, url_key, is_news=False):
-    """格式化数据并进行分类"""
-    classified_data = {category: [] for category in categories}
-
+async def format_data(data_list, url_key, is_news=False):
+    """格式化数据为可读文本，并添加序号""" 
+    formatted_data = []
     for index, item in enumerate(data_list[:30], start=1):
-        # 原始格式化逻辑
         title = item.get('title', '无标题') if not is_news else await translate_text(item.get('title', '无标题'))
         title = title if title is not None else '无标题'
         title = escape_html(title)
@@ -196,41 +113,57 @@ async def format_and_classify_data(data_list, url_key, is_news=False):
             desc = ""
 
         formatted_string = f"{index}. <a href=\"{url}\">{title}</a>{hot_info}{desc}"
+        formatted_data.append(formatted_string)
 
-        # 分类逻辑
-        text_to_classify = f"{title} {desc}"
-        category = await classify_text(text_to_classify, categories)
+    return formatted_data
 
-        if not category:  # 分类失败默认类别
-            category = "其他" # if not is_news else "国际"
+async def send_to_telegram(platform, formatted_data):
+    """发送数据到 Telegram 频道并记录消息 ID"""
+    top = formatted_data[:10]
+    first_hot_search = formatted_data[0] if formatted_data else "无热搜"
+    message = f"<b>{escape_html(platform)}</b> 热点榜单\n" + "\n\n".join(top)
+    sent_message = await bot.send_message(chat_id=TELEGRAM_CHANNEL_ID, text=message, parse_mode='HTML')
 
-        classified_data[category].append(formatted_string)
+    message_info = {
+        'id': sent_message.message_id,
+        'name': platform,
+        'first_hot_search': first_hot_search  # 记录第一条热搜
+    }
 
-    return classified_data
+    await asyncio.sleep(4)
 
-async def send_classified_data(platform, classified_data, is_news=False):
-    """按分类发送数据到不同频道"""
-    # 1. 发送原始聚合数据到主频道
-    all_items = []
-    for category in classified_data:
-        all_items.extend(classified_data[category][:5])  # 每个分类取前5条
+    # 获取群组中的最新消息
+    offset = 0
+    forwarded_message_id = None
+    sent_time = sent_message.date.timestamp()
 
-    if all_items:
-        message = f"<b>{escape_html(platform)} 热点精选</b>\n\n" + "\n\n".join(all_items[:15])
-        await bot.send_message(chat_id=TELEGRAM_CHANNEL_ID, text=message, parse_mode='HTML')
+    while True:
+        updates = await bot.get_updates(offset=offset)
+        if not updates:
+            break
+
+        for update in updates:
+            if update.message and update.message.chat.id == int(TELEGRAM_GROUP_ID):
+                if update.message.date.timestamp() > sent_time and update.message.is_automatic_forward:
+                    forwarded_message_id = update.message.message_id
+                    break
+            offset = update.update_id + 1
+
+        if forwarded_message_id is not None:
+            break
+
+    if forwarded_message_id is None:
+        print("未找到转发的消息 ID")
+        return message_info  # 返回消息信息
+
+    for i in range(10, len(formatted_data), 10):
+        group = formatted_data[i:i + 10]
+        comment_message = "\n\n".join(group)
+        await bot.send_message(chat_id=TELEGRAM_GROUP_ID, text=comment_message, parse_mode='HTML', reply_to_message_id=forwarded_message_id)
         await asyncio.sleep(2)
 
-    # 2. 发送完整分类数据到各专业频道
-    for category, items in classified_data.items():
-        if items and category in CATEGORY_CHANNELS:
-            channel_id = CATEGORY_CHANNELS[category]
-            header = "📰 " if is_news else "🔥 "
-            message = f"{header}<b>{escape_html(platform)} - {category}精选</b>\n\n" + "\n\n".join(items[:15])
-            try:
-                await bot.send_message(chat_id=channel_id, text=message, parse_mode='HTML')
-                await asyncio.sleep(1)
-            except Exception as e:
-                print(f"发送到{channel_id}失败: {str(e)}")
+    # 返回记录的消息信息
+    return message_info
 
 async def main():
     tz = pytz.timezone('Asia/Shanghai')
@@ -239,23 +172,46 @@ async def main():
     await bot.pin_chat_message(chat_id=TELEGRAM_CHANNEL_ID, message_id=init_message.message_id)
     await asyncio.sleep(2)
 
-    all_message_info = []
-
-    for platform in PLATFROMS:
-        print(f"正在获取：{platform[0]}")
-        data = await fetch_hot_data(platform[0])
-        if data:
-            classified = await format_and_classify_data(data, platform[1])
-            await send_classified_data(platform[0], classified)
-        await asyncio.sleep(2)
+    all_message_info = []  # 用于记录所有热搜榜单的消息 ID 和名称
 
     for media in FOREIGN_MEDIA:
         print(f"正在获取：{media[0]}")
         articles = await fetch_news_data(source=media[1])
         if articles:
-            classified = await format_and_classify_data(articles, 'url', is_news=True)
-            await send_classified_data(media[0], classified, is_news=True)
+            formatted_news = await format_data(articles, 'url', is_news=True)
+            message_info = await send_to_telegram(media[0], formatted_news)
+            all_message_info.append(message_info)
         await asyncio.sleep(2)
+
+    for category in CATEGORIES:
+        print(f"正在获取：{category[0]}")
+        articles = await fetch_news_data(category=category[1])
+        if articles:
+            formatted_news = await format_data(articles, 'url', is_news=True)
+            message_info = await send_to_telegram(category[0], formatted_news)
+            all_message_info.append(message_info)
+        await asyncio.sleep(2)
+
+    for platform in PLATFROMS:
+        print(f"正在获取：{platform[0]}")
+        data = await fetch_hot_data(platform[0])
+        if data:
+            formatted = await format_data(data, platform[1])
+            message_info = await send_to_telegram(platform[0], formatted)
+            all_message_info.append(message_info)
+        await asyncio.sleep(2)
+
+    if all_message_info:
+        jump_message = f"北京时间: <b>{current_time}</b>\n<b>-快-速-预-览-</b>\n\n"
+        links = []
+
+        for info in all_message_info:
+            link = f"<b><a href='https://t.me/{TELEGRAM_CHANNEL_ID[1:]}/{info['id']}'>☞  {escape_html(info['name'])} 榜单</a></b>\n\n首条: {info['first_hot_search'][3:]}"
+            links.append(link)
+
+        jump_message += "\n\n".join(links)
+        share_message = jump_message + "\n\n<i>自动更新，<a href='https://github.com/Lifelong-Learning-Water/Telegram-Bot'>开源项目</a>，<b><a href='https://t.me/hot_search_aggregation'>热点聚合</a>！</b></i>"
+        await bot.send_message(chat_id=TELEGRAM_CHANNEL_ID, text=share_message, parse_mode='HTML')
 
 if __name__ == '__main__':
     asyncio.run(main())
