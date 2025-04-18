@@ -42,7 +42,12 @@ CATEGORY_CHANNELS = {
     "科技": "@tech_news_aggregation",
     "财经": "@finance_news_aggregation",
     "国际": "@world_news_aggregation",
-    # 添加更多分类映射
+    "体育": "@sports_news_aggregation",
+    "娱乐": "@entertainment_news_aggregation",
+    "健康": "@health_news_aggregation",
+    "教育": "@education_news_aggregation",
+    "军事": "@military_news_aggregation",
+    "其他": "@general_news_aggregation",
 }
 
 # 新增分类函数
