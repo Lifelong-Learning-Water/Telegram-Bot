@@ -6,6 +6,7 @@ import pytz
 from telegram import Bot
 import translators as ts
 import re
+from collections import defaultdict
 
 # 配置信息
 API_BASE_URL = "https://api.pearktrue.cn/api/dailyhot/"
