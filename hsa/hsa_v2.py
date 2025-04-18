@@ -71,29 +71,30 @@ CATEGORY_DESCRIPTIONS = {
 }
 
 async def classify_text(text, categories):
-    """使用中文优化模型进行分类"""
+    """优化后的中文文本分类函数"""
     if not text or len(text) < 3:
         return None
     
-    # 使用类别描述作为提示
-    candidate_labels = [f"{cat}: {CATEGORY_DESCRIPTIONS[cat]}" for cat in categories]
+    # 预处理文本
+    processed_text = preprocess_text(text)
+    
+    # 准备带有描述的标签
+    candidate_labels = [f"{cat}: {CATEGORY_DESCRIPTIONS.get(cat, '')}" for cat in categories]
     
     try:
-        result = classifier(text, candidate_labels, multi_label=False)
-        # 提取最可能的类别(去掉描述部分)
+        result = classifier(
+            processed_text, 
+            candidate_labels, 
+            multi_label=False,
+            hypothesis_template="这个文本关于{}"  # 中文优化模板
+        )
+        
+        # 提取最可能的类别
         best_label = result["labels"][0].split(":")[0]
-        return best_label
-    except Exception as e:
-        print(f"分类错误: {str(e)}")
-        return None
-
-async def classify_text(text, categories):
-    """使用零样本分类对文本进行分类"""
-    if not text or len(text) < 3:  # 过滤过短文本
-        return None
-    try:
-        result = classifier(text, categories, multi_label=False)
-        return result["labels"][0]  # 返回最可能的类别
+        confidence = result["scores"][0]
+        
+        # 只返回置信度高于阈值的分类
+        return best_label if confidence > 0.6 else "其他"
     except Exception as e:
         print(f"分类错误: {str(e)}")
         return None
