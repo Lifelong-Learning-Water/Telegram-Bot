@@ -8,10 +8,11 @@ import translators as ts
 import re
 from collections import defaultdict
 
-# 配置信息
 API_BASE_URL = "https://api.pearktrue.cn/api/dailyhot/"
 NEWS_API_URL = "https://newsapi.org/v2/top-headlines"
 NEWS_API_KEY = os.environ["NEWS_API_KEY"]
+OLLAMA_API_URL = "http://223.113.190.117:11434/api/generate"
+
 PLATFROMS = [
     ["哔哩哔哩", "mobileUrl"], ["微博", "url"],
     ["百度贴吧", "url"], ["少数派", "url"],
@@ -29,15 +30,6 @@ CATEGORIES = [
     ["世界-商业", "business"], ["世界-科学", "science"], ["世界-技术", "technology"], ["世界-综合", "general"]
 ]
 
-TELEGRAM_BOT_TOKEN = os.environ["BOT_TOKEN"]
-TELEGRAM_CHANNEL_ID = '@hot_spot_aggregation' # -1002536090782
-TELEGRAM_GROUP_ID = '-1002699038758'
-
-bot = Bot(token=TELEGRAM_BOT_TOKEN)
-# _ = ts.preaccelerate_and_speedtest()
-
-# 新增配置项
-OLLAMA_API_URL = "http://223.113.190.117:11434/api/generate"  # Ollama服务地址
 CATEGORY_CHANNELS = {
     "科技": "@tech_news_aggregation",
     "财经": "@finance_news_aggregation",
@@ -50,32 +42,12 @@ CATEGORY_CHANNELS = {
     "其他": "@general_news_aggregation",
 }
 
-# 可选分类：科技、财经、政治、体育、娱乐、健康、教育、军事、其他
+TELEGRAM_BOT_TOKEN = os.environ["BOT_TOKEN"]
+TELEGRAM_CHANNEL_ID = '@hot_spot_aggregation' # -1002536090782
+TELEGRAM_GROUP_ID = '-1002699038758'
 
-async def classify_with_ollama(text):
-    prompt = f"""请对以下新闻内容进行分类，仅返回分类结果：
-    可选分类：科技、财经、政治、体育、娱乐、健康、教育、军事、其他
-    内容：{text[:1000]}
-    返回格式：{{"category": "分类名称"}}"""
-    
-    payload = {
-        "model": "qwen2.5:14b",  # 根据实际模型调整
-        "prompt": prompt,
-        "format": "json",
-        "stream": False
-    }
-    
-    try:
-        async with aiohttp.ClientSession() as session:
-            async with session.post(OLLAMA_API_URL, json=payload, timeout=30) as response:
-                result = await response.json()
-                if 'response' in result:
-                    match = re.search(r'{\s*"category":\s*"([^"]+)"\s*}', result['response'])
-                    return match.group(1) if match else "其他"
-                return "其他"
-    except Exception as e:
-        print(f"分类失败: {str(e)}")
-        return "其他"
+bot = Bot(token=TELEGRAM_BOT_TOKEN)
+# _ = ts.preaccelerate_and_speedtest()
 
 def escape_html(text):
     if text is None:
@@ -129,6 +101,32 @@ async def translate_text(text):
         print(f"翻译错误：{text}，错误信息：{str(e)}")
         return text
 
+async def classify_with_ollama(text):
+    """使用ollma部署的开源模型判断类别"""
+    prompt = f"""请对以下新闻内容进行分类，仅返回分类结果：
+    可选分类：科技、财经、政治、体育、娱乐、健康、教育、军事、其他
+    内容：{text[:1000]}
+    返回格式：{{"category": "分类名称"}}"""
+    
+    payload = {
+        "model": "qwen2.5:14b",
+        "prompt": prompt,
+        "format": "json",
+        "stream": False
+    }
+    
+    try:
+        async with aiohttp.ClientSession() as session:
+            async with session.post(OLLAMA_API_URL, json=payload, timeout=30) as response:
+                result = await response.json()
+                if 'response' in result:
+                    match = re.search(r'{\s*"category":\s*"([^"]+)"\s*}', result['response'])
+                    return match.group(1) if match else "其他"
+                return "其他"
+    except Exception as e:
+        print(f"分类失败: {str(e)}")
+        return "其他"
+
 async def format_data(data_list, url_key, is_news=False):
     """格式化数据为可读文本，并添加序号""" 
     formatted_data = []
@@ -174,7 +172,7 @@ async def send_to_telegram(platform, formatted_data):
 
     await asyncio.sleep(4)
 
-    # 获取群组中的最新消息
+    # 获取关联群组中应该被回复的自动转发消息
     offset = 0
     forwarded_message_id = None
     sent_time = sent_message.date.timestamp()
