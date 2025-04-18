@@ -225,7 +225,7 @@ async def main():
     await asyncio.sleep(2)
 
     all_message_info = []  # 用于记录所有热搜榜单的消息 ID 和名称
-"""
+    """
     for media in FOREIGN_MEDIA:
         print(f"正在获取：{media[0]}")
         articles = await fetch_news_data(source=media[1])
@@ -243,7 +243,7 @@ async def main():
             message_info = await send_to_telegram(category[0], formatted_news)
             all_message_info.append(message_info)
         await asyncio.sleep(2)
-"""
+    """
     for platform in PLATFROMS:
         print(f"正在获取：{platform[0]}")
         data = await fetch_hot_data(platform[0])
