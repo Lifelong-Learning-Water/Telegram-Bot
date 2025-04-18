@@ -36,10 +36,10 @@ TELEGRAM_CHANNEL_ID = '@tech_news_aggregation'
 # 分类频道映射
 CATEGORY_CHANNELS = {
     "科技": "@tech_news_aggregation",
-    "财经": "@finance_news_channel",
-    "娱乐": "@entertainment_channel",
-    "社会": "@society_news_channel",
-    "国际": "@world_news_channel"
+    "财经": "@finance_news_aggregation",
+    "娱乐": "@entertainment_news_aggregation",
+    "社会": "@society_news_aggregation",
+    "国际": "@world_news_aggregation"
 }
 
 bot = Bot(token=TELEGRAM_BOT_TOKEN)
