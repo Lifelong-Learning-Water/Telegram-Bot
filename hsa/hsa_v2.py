@@ -31,8 +31,16 @@ CATEGORIES = [
 ]
 
 TELEGRAM_BOT_TOKEN = os.environ["BOT_TOKEN"]
-TELEGRAM_CHANNEL_ID = '@hot_spot_aggregation' # -1002536090782
-TELEGRAM_GROUP_ID = '-1002699038758'
+TELEGRAM_CHANNEL_ID = '@tech_news_aggregation'
+
+# 分类频道映射
+CATEGORY_CHANNELS = {
+    "科技": "@tech_news_aggregation",
+    "财经": "@finance_news_channel",
+    "娱乐": "@entertainment_channel",
+    "社会": "@society_news_channel",
+    "国际": "@world_news_channel"
+}
 
 bot = Bot(token=TELEGRAM_BOT_TOKEN)
 # _ = ts.preaccelerate_and_speedtest()
@@ -146,15 +154,6 @@ async def format_and_classify_data(data_list, url_key, is_news=False):
 
 async def send_classified_data(platform, classified_data, is_news=False):
     """按分类发送数据到不同频道"""
-    # 分类频道映射
-    CATEGORY_CHANNELS = {
-        "科技": "@tech_news_channel",
-        "财经": "@finance_news_channel",
-        "娱乐": "@entertainment_channel",
-        "社会": "@society_news_channel",
-        "国际": "@world_news_channel"
-    }
-    
     # 1. 发送原始聚合数据到主频道
     all_items = []
     for category in classified_data:
