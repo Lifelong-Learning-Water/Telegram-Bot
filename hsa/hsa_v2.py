@@ -48,8 +48,9 @@ categories = ["科技", "财经", "娱乐", "社会", "国际", "其他"]  # 定
 bot = Bot(token=TELEGRAM_BOT_TOKEN)
 # _ = ts.preaccelerate_and_speedtest()
 
-classifier = pipeline("zero-shot-classification", 
-                     model="MoritzLaurer/DeBERTa-v3-large-mnli-fever-anli-ling-wanli",
+# 专门为中文优化的零样本模型
+classifier = pipeline("zero-shot-classification",
+                     model="bert-base-chinese",
                      device="cuda" if torch.cuda.is_available() else "cpu")
 
 # 更细化的中文分类类别
@@ -88,7 +89,7 @@ async def classify_text(text, categories):
             processed_text, 
             candidate_labels, 
             multi_label=False,
-            hypothesis_template="这个文本关于{}"  # 中文优化模板
+            hypothesis_template="这个文本主要关于{}"  # 中文优化模板
         )
         
         # 提取最可能的类别
