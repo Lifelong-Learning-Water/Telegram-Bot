@@ -50,6 +50,43 @@ classifier = pipeline("zero-shot-classification",
                      model="MoritzLaurer/mDeBERTa-v3-base-mnli-xnli",
                      device="cuda" if torch.cuda.is_available() else "cpu")
 
+# 更细化的中文分类类别
+CATEGORIES = [
+    "科技", "财经", "娱乐", "社会", "国际", 
+    "体育", "健康", "教育", "军事", "汽车"
+]
+
+# 添加类别描述提高准确度
+CATEGORY_DESCRIPTIONS = {
+    "科技": "包括互联网、人工智能、电子产品、软件开发等技术相关内容",
+    "财经": "涉及股票、金融、投资、经济政策、市场趋势等内容",
+    "娱乐": "涵盖明星、电影、电视剧、音乐、综艺节目等娱乐产业内容",
+    "社会": "关于民生、法律、公共事件、社会现象等社会生活内容",
+    "国际": "国际关系、外交政策、全球事件等跨国内容",
+    "体育": "体育赛事、运动员、体育产业相关内容",
+    "健康": "医疗、养生、疾病预防、健康生活方式等内容",
+    "教育": "学校教育、教育改革、考试政策、学术研究等内容",
+    "军事": "国防、武器装备、军事行动、军事科技等内容",
+    "汽车": "汽车行业、新车发布、汽车技术、车展等内容"
+}
+
+async def classify_text(text, categories):
+    """使用中文优化模型进行分类"""
+    if not text or len(text) < 3:
+        return None
+    
+    # 使用类别描述作为提示
+    candidate_labels = [f"{cat}: {CATEGORY_DESCRIPTIONS[cat]}" for cat in categories]
+    
+    try:
+        result = classifier(text, candidate_labels, multi_label=False)
+        # 提取最可能的类别(去掉描述部分)
+        best_label = result["labels"][0].split(":")[0]
+        return best_label
+    except Exception as e:
+        print(f"分类错误: {str(e)}")
+        return None
+
 async def classify_text(text, categories):
     """使用零样本分类对文本进行分类"""
     if not text or len(text) < 3:  # 过滤过短文本
@@ -60,6 +97,20 @@ async def classify_text(text, categories):
     except Exception as e:
         print(f"分类错误: {str(e)}")
         return None
+
+def preprocess_text(text):
+    """预处理文本以提高分类准确度"""
+    if not text:
+        return ""
+    
+    # 移除URL、特殊字符和多余空格
+    text = re.sub(r'http\S+|www\S+|https\S+', '', text, flags=re.MULTILINE)
+    text = re.sub(r'\@\w+|\#', '', text)
+    text = re.sub(r'[^\w\s\u4e00-\u9fff]', '', text)  # 保留中文和基本字符
+    text = re.sub(r'\s+', ' ', text).strip()
+    
+    # 截断过长的文本(模型有token限制)
+    return text[:500]
 
 def escape_html(text):
     if text is None:
