@@ -99,7 +99,7 @@ async def translate_text(text):
         return ""
     try:
         translated_text = ts.translate_text(text, translator='caiyun', from_language='en', to_language='zh')
-        await asyncio.sleep(2)
+        await asyncio.sleep(3)
         return translated_text
     except Exception as e:
         print(f"翻译错误：{text}，错误信息：{str(e)}")
