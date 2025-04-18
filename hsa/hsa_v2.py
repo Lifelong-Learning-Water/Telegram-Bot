@@ -49,10 +49,8 @@ bot = Bot(token=TELEGRAM_BOT_TOKEN)
 # _ = ts.preaccelerate_and_speedtest()
 
 # 专门为中文优化的零样本模型
-classifier = pipeline("zero-shot-classification",
-                     model="bert-base-chinese",
+classifier = pipeline("zero-shot-classification",                     model="MoritzLaurer/DeBERTa-v3-large-mnli-fever-anli-ling-wanli",
                      device="cuda" if torch.cuda.is_available() else "cpu")
-
 # 更细化的中文分类类别
 CATEGORIES = [
     "科技", "财经", "娱乐", "社会", "国际", 
