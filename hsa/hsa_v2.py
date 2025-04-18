@@ -33,7 +33,8 @@ CATEGORIES = [
 CATEGORY_CHANNELS = {
     "科技": "@tech_news_aggregation",
     "财经": "@finance_news_aggregation",
-    "政治": "@politics_news_aggregation",
+    "国际": "@world_news_aggregation",
+    "社会": "@society_news_aggregation",
     "军事": "@military_news_aggregation",
     "其他": "@general_news_aggregation",
 }
@@ -107,7 +108,7 @@ async def translate_text(text):
 async def classify_with_ollama(text):
     """使用ollma部署的开源模型判断类别"""
     prompt = f"""请对以下新闻标题（和概要）进行分类，仅返回分类结果：
-    可选分类：科技、财经、政治、体育、娱乐、健康、教育、军事、其他
+    可选分类：科技、财经、国际、社会、体育、娱乐、健康、教育、军事、其他
 
     内容：{text[:1000]}
 
