@@ -43,6 +43,8 @@ CATEGORY_CHANNELS = {
     "国际": "@world_news_aggregation"
 }
 
+categories = ["科技", "财经", "娱乐", "社会", "国际", "其他"]  # 定义分类类别
+
 bot = Bot(token=TELEGRAM_BOT_TOKEN)
 # _ = ts.preaccelerate_and_speedtest()
 
@@ -167,7 +169,6 @@ async def translate_text(text):
 
 async def format_and_classify_data(data_list, url_key, is_news=False):
     """格式化数据并进行分类"""
-    categories = ["科技", "财经", "娱乐", "社会", "国际"]  # 定义分类类别
     classified_data = {category: [] for category in categories}
 
     for index, item in enumerate(data_list[:30], start=1):
