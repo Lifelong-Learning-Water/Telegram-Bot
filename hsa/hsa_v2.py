@@ -115,7 +115,7 @@ async def classify_with_ollama(text):
     返回格式：{{"category": "分类名称"}}"""
     
     payload = {
-        "model": "deepseek-r1:1.5b",
+        "model": "qwen2.5:32b",
         "prompt": prompt,
         "format": "json",
         "stream": False
