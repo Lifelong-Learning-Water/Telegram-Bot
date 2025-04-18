@@ -225,7 +225,7 @@ async def fetch_and_process(media_list, fetch_function, is_news=False):
     """获取并处理新闻/热搜数据"""
     for item in media_list:
         print(f"正在获取：{item[0]}")
-        source = item[1] if is_news else "url"
+        source = item[1] if is_news else item[0]
         data = await fetch_function(source)
         if data
             format_key = "url" if is_news else item[1]
