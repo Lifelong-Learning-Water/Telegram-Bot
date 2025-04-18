@@ -35,6 +35,42 @@ TELEGRAM_GROUP_ID = '-1002699038758'
 bot = Bot(token=TELEGRAM_BOT_TOKEN)
 # _ = ts.preaccelerate_and_speedtest()
 
+新增配置项
+OLLAMA_API_URL = "http://localhost:11434/api/generate"  # Ollama服务地址
+CATEGORY_CHANNELS = {
+    "科技": "@tech_channel",
+    "财经": "@finance_channel",
+    "国际": "@world_channel",
+    # 添加更多分类映射
+}
+
+# 新增分类函数
+async def classify_with_ollama(text):
+    prompt = f"""请对以下新闻内容进行分类，仅返回分类结果：
+    可选分类：科技、财经、国际、体育、娱乐、健康、教育、军事、其他
+    内容：{text[:1000]}  # 控制输入长度
+    
+    返回格式：{{"category": "分类名称"}}"""
+    
+    payload = {
+        "model": "llama3",  # 根据实际模型调整
+        "prompt": prompt,
+        "format": "json",
+        "stream": False
+    }
+    
+    try:
+        async with aiohttp.ClientSession() as session:
+            async with session.post(OLLAMA_API_URL, json=payload, timeout=30) as response:
+                result = await response.json()
+                if 'response' in result:
+                    match = re.search(r'{\s*"category":\s*"([^"]+)"\s*}', result['response'])
+                    return match.group(1) if match else "其他"
+                return "其他"
+    except Exception as e:
+        print(f"分类失败: {str(e)}")
+        return "其他"
+
 def escape_html(text):
     if text is None:
         return ""
@@ -164,6 +200,27 @@ async def send_to_telegram(platform, formatted_data):
 
     # 返回记录的消息信息
     return message_info
+
+async def process_articles(articles, source_name):
+    categorized = defaultdict(list)
+    for article in articles:
+        # 组合分类依据
+        classification_text = f"{article.get('title','')} {article.get('description','')}"
+        category = await classify_with_ollama(classification_text)
+        
+        # 格式化条目
+        formatted = await format_entry(article)
+        categorized[category].append(formatted)
+    
+    # 分频道发送
+    for category, items in categorized.items():
+        channel_id = CATEGORY_CHANNELS.get(category, "@default_channel")
+        await send_to_category_channel(channel_id, source_name, category, items)
+
+async def send_to_category_channel(channel_id, source, category, items):
+    message = f"【{source} - {category}】最新动态：\n\n" + "\n\n".join(items[:15])
+    await bot.send_message(chat_id=channel_id, text=message, parse_mode='HTML')
+    await asyncio.sleep(2)
 
 async def main():
     tz = pytz.timezone('Asia/Shanghai')
