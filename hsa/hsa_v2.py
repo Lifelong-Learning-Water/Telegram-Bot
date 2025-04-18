@@ -248,6 +248,7 @@ async def fetch_and_process(media_list, is_news=False, is_category=False):
             return message_info
         else:
             print(f"未能获取到数据：{item[0]}")
+
 async def main():
     tz = pytz.timezone('Asia/Shanghai')
     current_time = datetime.now(tz).strftime("%Y-%m-%d %H:%M")
