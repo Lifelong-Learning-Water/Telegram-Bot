@@ -34,13 +34,16 @@ CATEGORY_CHANNELS = {
     "科技": "@tech_news_aggregation",
     "财经": "@finance_news_aggregation",
     "政治": "@politics_news_aggregation",
-    # "体育": "@sports_news_aggregation",
-    # "娱乐": "@entertainment_news_aggregation",
-    # "健康": "@health_news_aggregation",
-    # "教育": "@education_news_aggregation",
     "军事": "@military_news_aggregation",
     "其他": "@general_news_aggregation",
 }
+
+""" 因tg免费用户公开频道上限，暂时不使用的分类：
+    "体育": "@sports_news_aggregation",
+    "娱乐": "@entertainment_news_aggregation",
+    "健康": "@health_news_aggregation",
+    "教育": "@education_news_aggregation",
+"""
 
 TELEGRAM_BOT_TOKEN = os.environ["BOT_TOKEN"]
 TELEGRAM_CHANNEL_ID = '@hot_spot_aggregation' # -1002536090782
@@ -103,9 +106,11 @@ async def translate_text(text):
 
 async def classify_with_ollama(text):
     """使用ollma部署的开源模型判断类别"""
-    prompt = f"""请对以下新闻内容进行分类，仅返回分类结果：
+    prompt = f"""请对以下新闻标题（和概要）进行分类，仅返回分类结果：
     可选分类：科技、财经、政治、体育、娱乐、健康、教育、军事、其他
+
     内容：{text[:1000]}
+
     返回格式：{{"category": "分类名称"}}"""
     
     payload = {
