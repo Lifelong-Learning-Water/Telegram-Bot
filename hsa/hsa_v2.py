@@ -38,9 +38,9 @@ bot = Bot(token=TELEGRAM_BOT_TOKEN)
 # 新增配置项
 OLLAMA_API_URL = "http://localhost:11434/api/generate"  # Ollama服务地址
 CATEGORY_CHANNELS = {
-    "科技": "@tech_channel",
-    "财经": "@finance_channel",
-    "国际": "@world_channel",
+    "科技": "@tech_news_aggregation",
+    "财经": "@finance_news_aggregation",
+    "国际": "@world_news_aggregation",
     # 添加更多分类映射
 }
 
