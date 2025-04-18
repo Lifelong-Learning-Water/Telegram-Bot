@@ -221,6 +221,18 @@ async def send_to_category_channel(channel_id, source, category, items):
     await bot.send_message(chat_id=channel_id, text=message, parse_mode='HTML')
     await asyncio.sleep(2)
 
+async def fetch_and_process(media_list, fetch_function, format_key, is_news=False):
+    """获取并处理新闻/热搜数据"""
+    for item in media_list:
+        print(f"正在获取：{item[0]}")
+        articles = await fetch_function(item[1])  # 使用传入的fetch_function
+        if articles:
+            formatted_news = await format_data(articles, format_key, is_news=is_news)
+            message_info = await send_to_telegram(item[0], formatted_news)
+            await process_articles(formatted_news, item[0])
+            await asyncio.sleep(2)
+            return message_info
+
 async def main():
     tz = pytz.timezone('Asia/Shanghai')
     current_time = datetime.now(tz).strftime("%Y-%m-%d %H:%M")
@@ -228,43 +240,16 @@ async def main():
     await bot.pin_chat_message(chat_id=TELEGRAM_CHANNEL_ID, message_id=init_message.message_id)
     await asyncio.sleep(2)
 
-    all_message_info = []  # 用于记录所有热搜榜单的消息 ID 和名称
+    first_message_info = [] # 记录每个榜单的第一条新闻/热搜
+    first_message_info.append(await fetch_and_process(FOREIGN_MEDIA, fetch_news_data, 'url', is_news=True))
+    first_message_info.append(await fetch_and_process(CATEGORIES, fetch_news_data, 'url', is_news=True))
+    first_message_info.append(await fetch_and_process(PLATFROMS, fetch_hot_data, platform[1]))
 
-    for media in FOREIGN_MEDIA:
-        print(f"正在获取：{media[0]}")
-        articles = await fetch_news_data(source=media[1])
-        if articles:
-            formatted_news = await format_data(articles, 'url', is_news=True)
-            message_info = await send_to_telegram(media[0], formatted_news)
-            await process_articles(formatted_news, media[0])
-            all_message_info.append(message_info)
-        await asyncio.sleep(2)
-
-    for category in CATEGORIES:
-        print(f"正在获取：{category[0]}")
-        articles = await fetch_news_data(category=category[1])
-        if articles:
-            formatted_news = await format_data(articles, 'url', is_news=True)
-            message_info = await send_to_telegram(category[0], formatted_news)
-            await process_articles(formatted_news, category[0])
-            all_message_info.append(message_info)
-        await asyncio.sleep(2)
-
-    for platform in PLATFROMS:
-        print(f"正在获取：{platform[0]}")
-        data = await fetch_hot_data(platform[0])
-        if data:
-            formatted = await format_data(data, platform[1])
-            message_info = await send_to_telegram(platform[0], formatted)
-            await process_articles(formatted, platform[0])
-            all_message_info.append(message_info)
-        await asyncio.sleep(2)
-
-    if all_message_info:
+    if first_message_info:
         jump_message = f"北京时间: <b>{current_time}</b>\n<b>-快-速-预-览-</b>\n\n"
         links = []
 
-        for info in all_message_info:
+        for info in first_message_info:
             link = f"<b><a href='https://t.me/{TELEGRAM_CHANNEL_ID[1:]}/{info['id']}'>☞  {escape_html(info['name'])} 榜单</a></b>\n\n首条: {info['first_hot_search'][3:]}"
             links.append(link)
 
