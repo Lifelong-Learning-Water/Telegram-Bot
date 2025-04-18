@@ -103,7 +103,7 @@ async def translate_text(text):
         print(f"翻译错误：{text}，错误信息：{str(e)}")
         return text
 
-format_and_classify_data(data_list, url_key, is_news=False):
+async def format_and_classify_data(data_list, url_key, is_news=False):
     """格式化数据并进行分类"""
     categories = ["科技", "财经", "娱乐", "社会", "国际"]  # 定义分类类别
     classified_data = {category: [] for category in categories}
