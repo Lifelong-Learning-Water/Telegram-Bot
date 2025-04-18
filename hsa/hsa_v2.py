@@ -35,7 +35,7 @@ TELEGRAM_GROUP_ID = '-1002699038758'
 bot = Bot(token=TELEGRAM_BOT_TOKEN)
 # _ = ts.preaccelerate_and_speedtest()
 
-新增配置项
+# 新增配置项
 OLLAMA_API_URL = "http://localhost:11434/api/generate"  # Ollama服务地址
 CATEGORY_CHANNELS = {
     "科技": "@tech_channel",
