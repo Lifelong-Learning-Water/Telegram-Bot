@@ -7,6 +7,7 @@ from telegram import Bot
 import translators as ts
 import re
 from transformers import pipeline
+import torch
 
 # 配置信息
 API_BASE_URL = "https://api.pearktrue.cn/api/dailyhot/"
@@ -46,7 +47,8 @@ bot = Bot(token=TELEGRAM_BOT_TOKEN)
 # _ = ts.preaccelerate_and_speedtest()
 
 classifier = pipeline("zero-shot-classification", 
-                     model="facebook/bart-large-mnli")
+                     model="MoritzLaurer/mDeBERTa-v3-base-mnli-xnli",
+                     device="cuda" if torch.cuda.is_available() else "cpu")
 
 async def classify_text(text, categories):
     """使用零样本分类对文本进行分类"""
