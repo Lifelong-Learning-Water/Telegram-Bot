@@ -103,10 +103,13 @@ async def translate_text(text):
         print(f"翻译错误：{text}，错误信息：{str(e)}")
         return text
 
-async def format_data(data_list, url_key, is_news=False):
-    """格式化数据为可读文本，并添加序号""" 
-    formatted_data = []
+format_and_classify_data(data_list, url_key, is_news=False):
+    """格式化数据并进行分类"""
+    categories = ["科技", "财经", "娱乐", "社会", "国际"]  # 定义分类类别
+    classified_data = {category: [] for category in categories}
+    
     for index, item in enumerate(data_list[:30], start=1):
+        # 原始格式化逻辑
         title = item.get('title', '无标题') if not is_news else await translate_text(item.get('title', '无标题'))
         title = title if title is not None else '无标题'
         title = escape_html(title)
@@ -129,10 +132,17 @@ async def format_data(data_list, url_key, is_news=False):
             desc = ""
 
         formatted_string = f"{index}. <a href=\"{url}\">{title}</a>{hot_info}{desc}"
-        formatted_data.append(formatted_string)
-
-    return formatted_data
-
+        
+        # 分类逻辑
+        text_to_classify = f"{title} {desc}"
+        category = await classify_text(text_to_classify, categories)
+        
+        if not category:  # 分类失败默认类别
+            category = "社会" if not is_news else "国际"
+            
+        classified_data[category].append(formatted_string)
+    
+    return classified_data
 async def send_to_telegram(platform, formatted_data):
     """发送数据到 Telegram 频道并记录消息 ID"""
     top = formatted_data[:10]
