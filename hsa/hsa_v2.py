@@ -60,23 +60,41 @@ CATEGORY_HIERARCHY = {
     "财经": ["股市", "宏观经济", "公司动态", "投资理财", "金融科技", "消费"],
     "娱乐": ["影视", "音乐", "游戏", "明星", "综艺", "动漫"],
     "社会": ["民生", "法治", "教育", "健康", "环境", "就业"],
-    "国际": ["政治", "经济", "军事", "外交", "国际组织"],
-    "体育": ["足球", "篮球", "综合", "电竞", "冬奥"],
-    "汽车": ["新能源", "传统车企", "智能驾驶", "车展", "政策"],
-    "房产": ["政策", "市场", "家居", "装修", "物业"]
+    "国际": ["政治", "经济", "军事", "外交", "国际组织"]
 }
 
-async def classify_text(text, categories):
+# 生成平铺的分类标签
+def generate_category_labels():
+    labels = []
+    for parent, children in CATEGORY_HIERARCHY.items():
+        labels.extend([f"{parent}-{child}" for child in children])
+    return labels
+
+CATEGORY_LABELS = generate_category_labels()
+
+# 改进的分类函数
+async def classify_text(text, categories=None):
     """使用零样本分类对文本进行分类"""
-    if not text or len(text) < 3:  # 过滤过短文本
+    if not text or len(text) < 10:  # 过滤过短文本
         return None
+    
+    # 如果没有指定分类，使用默认分类体系
+    if categories is None:
+        categories = CATEGORY_LABELS
+    
     try:
-        result = classifier(text, categories, multi_label=False)
-        return result["labels"][0]  # 返回最可能的类别
+        result = classifier(text, categories, multi_label=True)
+        # 取置信度最高的前3个标签
+        top_labels = result["labels"][:3]
+        top_scores = result["scores"][:3]
+        
+        # 过滤低置信度的标签(阈值0.5)
+        filtered = [label for label, score in zip(top_labels, top_scores) if score > 0.5]
+        
+        return filtered if filtered else ["其他"]
     except Exception as e:
         print(f"分类错误: {str(e)}")
-        return None
-
+        return ["其他"]
 def escape_html(text):
     if text is None:
         return ""
