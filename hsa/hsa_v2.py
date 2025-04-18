@@ -42,15 +42,16 @@ CATEGORY_CHANNELS = {
     "科技": "@tech_news_aggregation",
     "财经": "@finance_news_aggregation",
     "国际": "@world_news_aggregation",
-    "体育": "@sports_news_aggregation",
-    "娱乐": "@entertainment_news_aggregation",
-    "健康": "@health_news_aggregation",
-    "教育": "@education_news_aggregation",
+    # "体育": "@sports_news_aggregation",
+    # "娱乐": "@entertainment_news_aggregation",
+    # "健康": "@health_news_aggregation",
+    # "教育": "@education_news_aggregation",
     "军事": "@military_news_aggregation",
     "其他": "@general_news_aggregation",
 }
 
-# 新增分类函数
+# 可选分类：科技、财经、国际、体育、娱乐、健康、教育、军事、其他
+
 async def classify_with_ollama(text):
     prompt = f"""请对以下新闻内容进行分类，仅返回分类结果：
     可选分类：科技、财经、国际、体育、娱乐、健康、教育、军事、其他
