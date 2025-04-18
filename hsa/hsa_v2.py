@@ -221,15 +221,24 @@ async def send_to_category_channel(channel_id, source, category, items):
     await bot.send_message(chat_id=channel_id, text=message, parse_mode='HTML')
     await asyncio.sleep(2)
 
-async def fetch_and_process(media_list, fetch_function, is_news=False):
+async def fetch_and_process(media_list, fetch_function, is_news=False, is_category=False):
     """获取并处理新闻/热搜数据"""
     for item in media_list:
         print(f"正在获取：{item[0]}")
-        source = item[1] if is_news else item[0]
-        data = await fetch_function(source)
+        source = ""
+        data = {}
+        if is_category:
+            category = item[1]
+            data = await fetch_function(category=category)
+        elif is_news:
+            source = item[1] if is_news else item[0]
+            data = await fetch_function(source=source)
+        else:
+            source = item[0]
+            data = await fetch_function(source)            
         if data
             format_key = "url" if is_news else item[1]
-            formatted_news = await format_data(articles, format_key, is_news=is_news)
+            formatted_news = await format_data(data, format_key, is_news=is_news)
             message_info = await send_to_telegram(item[0], formatted_news)
             await process_articles(formatted_news, item[0])
             await asyncio.sleep(2)
