@@ -255,6 +255,7 @@ async def main():
         if data:
             formatted = await format_data(data, platform[1])
             message_info = await send_to_telegram(platform[0], formatted)
+            await process_articles(data, platform[0])
             all_message_info.append(message_info)
         await asyncio.sleep(2)
 
