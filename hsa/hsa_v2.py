@@ -201,7 +201,7 @@ async def format_and_classify_data(data_list, url_key, is_news=False):
         category = await classify_text(text_to_classify, categories)
 
         if not category:  # 分类失败默认类别
-            category = "社会" if not is_news else "国际"
+            category = "其他" # if not is_news else "国际"
 
         classified_data[category].append(formatted_string)
 
