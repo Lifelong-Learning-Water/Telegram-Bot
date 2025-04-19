@@ -280,7 +280,7 @@ async def main():
         
         # 添加相关频道链接
         related_channels = """
-<b>分类聚合频道：</b>
+<b>旗下分类聚合频道，订阅属于你的分类！</b>
 
 <a href="https://t.me/tech_news_aggregation">科技聚合</a>  <a href="https://t.me/finance_news_aggregation">财经聚合</a>
 
