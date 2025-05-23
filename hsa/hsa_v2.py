@@ -12,7 +12,7 @@ API_BASE_URL = "https://api.pearktrue.cn/api/dailyhot/"
 NEWS_API_URL = "https://newsapi.org/v2/top-headlines"
 NEWS_API_KEY = os.environ["NEWS_API_KEY"]
 OLLAMA_API_URL = "http://61.189.189.2:11434/api/generate"
-model = "qwq:latest"
+Model = "qwq:latest"
 
 PLATFROMS = [
     ["哔哩哔哩", "mobileUrl"], ["微博", "url"],
@@ -116,7 +116,7 @@ async def classify_with_ollama(text):
     返回格式：{{"category": "分类名称"}}"""
     
     payload = {
-        "model": model,
+        "model": Model,
         "prompt": prompt,
         "format": "json",
         "stream": False
